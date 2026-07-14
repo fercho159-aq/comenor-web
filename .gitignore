@@ -30,8 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — secretos reales SOLO en los dashboards de Vercel/Supabase, jamás en git.
+.env
+.env.local
+.env*.local
+.env.development
+.env.production
+.env.test
+# .env.example SÍ se versiona: es el contrato de variables (PLAN.md §1.4).
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +46,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design-source/ NO se ignora a propósito: es la fuente de verdad visual y de copy
+# (slides, SVG, texto del cliente). Va versionado. No agregar aquí.

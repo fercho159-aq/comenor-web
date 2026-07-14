@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * COMENOR — sistema de diseño
+ * Fuente de verdad visual: docs/BRAND.md (extraído de COMENOR_Institucional 2026.pptx)
+ * Este archivo es propiedad del agente de marca. No editar desde otras tareas.
+ */
+
+@theme {
+  /* ——— Paleta (docs/BRAND.md, muestreada de los renders) ——— */
+  --color-verde: #004f4a; /* primario: titulares, tarjetas, panel del hero */
+  --color-verde-700: #0c5753; /* tarjeta alterna ligeramente más clara */
+  --color-verde-900: #1e3535; /* tarjetas alternas, pills oscuras */
+  --color-vino: #b62438; /* acento: barra inferior, swoosh del logo */
+  --color-vino-900: #7a1526; /* numeral de la tarjeta roja */
+  --color-humo: #e6e6e6; /* fondo de TODAS las vistas (no blanco) */
+  --color-salvia: #cad6d6; /* swoosh decorativo de fondo */
+  --color-tinta: #1e3535; /* texto de cuerpo */
+  --color-tinta-suave: #5a6a6a; /* eyebrow / labels */
+  --color-blanco: #ffffff; /* texto sobre verde/vino */
+
+  /* ——— Tipografía (Montserrat, definida en layout.tsx vía next/font) ——— */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala tipográfica de la presentación */
+  --text-display: clamp(2.25rem, 1.5rem + 3vw, 3.5rem); /* H1 de slide, ~48–56px */
+  --text-display--line-height: 1.15;
+  --text-display--font-weight: 700;
+  --text-titulo: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem); /* H2 / titulares secundarios */
+  --text-titulo--line-height: 1.2;
+  --text-titulo--font-weight: 700;
+  --text-eyebrow: 0.875rem; /* etiqueta en versalitas sobre el H1 */
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.08em;
+  --text-cuerpo: 1.0625rem; /* cuerpo 16–18px */
+  --text-cuerpo--line-height: 1.6;
+
+  /* ——— Tracking ——— */
+  --tracking-eyebrow: 0.08em; /* MAYÚSCULAS del eyebrow */
+  --tracking-wordmark: 0.35em; /* wordmark COMENOR */
+
+  /* ——— Radios ——— */
+  --radius-foto: 24px; /* fotos con esquinas muy redondeadas */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ——— Base ——— */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-humo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Selección de texto con la marca */
+::selection {
+  background-color: var(--color-verde);
+  color: var(--color-blanco);
+}
+
+/* Accesibilidad AA: anillo de foco visible y consistente en toda la UI */
+:focus-visible {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 2px;
+}
+
+/* Sobre fondos verdes/vino el anillo verde no contrasta: usar .tema-oscuro en esos bloques */
+.tema-oscuro :focus-visible {
+  outline-color: var(--color-blanco);
+}
+
+/* Respeto a usuarios con movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
