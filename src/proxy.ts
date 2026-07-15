@@ -41,7 +41,42 @@ function reglaPara(pathname: string): { prefijo: string; roles: readonly Rol[] }
   return null;
 }
 
+/**
+ * ¿Están configuradas las credenciales de Supabase? En un deploy sin las env
+ * vars (p. ej. el primer despliegue en Vercel antes de tener proyecto Supabase),
+ * `createServerClient` con cadenas vacías LANZA y tumbaría TODO el sitio —
+ * incluidas las páginas públicas. Se comprueba antes de crear el cliente.
+ */
+function supabaseConfigurado(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
+/** Redirige al login conservando el destino pretendido. */
+function redirigirALogin(request: NextRequest): NextResponse {
+  const urlLogin = request.nextUrl.clone();
+  urlLogin.pathname = RUTA_LOGIN;
+  urlLogin.search = "";
+  urlLogin.searchParams.set(
+    "siguiente",
+    request.nextUrl.pathname + request.nextUrl.search,
+  );
+  return NextResponse.redirect(urlLogin);
+}
+
 export default async function proxy(request: NextRequest): Promise<NextResponse> {
+  const regla = reglaPara(request.nextUrl.pathname);
+
+  // Sin backend de auth (Supabase no configurado): el sitio público debe
+  // seguir sirviéndose; las rutas protegidas fallan CERRADO (al login), nunca
+  // abiertas ni con un 500 que rompa toda la app.
+  if (!supabaseConfigurado()) {
+    if (!regla) return NextResponse.next({ request });
+    return redirigirALogin(request);
+  }
+
   let respuesta = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -72,7 +107,6 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
     data: { user },
   } = await supabase.auth.getUser();
 
-  const regla = reglaPara(request.nextUrl.pathname);
   if (!regla) {
     // Ruta pública: pasa intacta (con la sesión ya refrescada).
     return respuesta;
@@ -80,14 +114,7 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
 
   if (!user) {
     // Sin sesión → login, conservando a dónde quería ir.
-    const urlLogin = request.nextUrl.clone();
-    urlLogin.pathname = RUTA_LOGIN;
-    urlLogin.search = "";
-    urlLogin.searchParams.set(
-      "siguiente",
-      request.nextUrl.pathname + request.nextUrl.search,
-    );
-    const redireccion = NextResponse.redirect(urlLogin);
+    const redireccion = redirigirALogin(request);
     for (const cookie of respuesta.cookies.getAll()) {
       redireccion.cookies.set(cookie);
     }
