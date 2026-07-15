@@ -1,9 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  CalendarDays,
+  MapPin,
+  Monitor,
+  MonitorSmartphone,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Boton, cn } from "@/components/ui";
 
 import type { EventoConCupo } from "./_datos";
+
+/** Ícono de la modalidad del evento. */
+const ICONO_MODALIDAD: Record<EventoConCupo["modalidad"], LucideIcon> = {
+  presencial: MapPin,
+  virtual: Monitor,
+  hibrida: MonitorSmartphone,
+};
 import {
   etiquetaModalidad,
   formatearFechaCorta,
@@ -57,8 +72,18 @@ export default function TarjetaEvento({ evento }: { evento: EventoConCupo }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <p className="text-eyebrow tracking-eyebrow uppercase text-tinta-suave">
-          {formatearFechaCorta(evento.fecha)} · {etiquetaModalidad(evento.modalidad)}
+        <p className="text-eyebrow tracking-eyebrow flex flex-wrap items-center gap-x-3 gap-y-1 uppercase text-tinta-suave">
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarDays className="size-4 text-verde" strokeWidth={1.75} aria-hidden />
+            {formatearFechaCorta(evento.fecha)}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            {(() => {
+              const IconoMod = ICONO_MODALIDAD[evento.modalidad];
+              return <IconoMod className="size-4 text-verde" strokeWidth={1.75} aria-hidden />;
+            })()}
+            {etiquetaModalidad(evento.modalidad)}
+          </span>
         </p>
 
         <h3 className="text-titulo text-balance text-verde">
@@ -67,7 +92,10 @@ export default function TarjetaEvento({ evento }: { evento: EventoConCupo }) {
           </Link>
         </h3>
 
-        <p className="text-cuerpo text-tinta-suave">{evento.sede}</p>
+        <p className="text-cuerpo flex items-center gap-1.5 text-tinta-suave">
+          <MapPin className="size-4 shrink-0 text-tinta-suave" strokeWidth={1.75} aria-hidden />
+          {evento.sede}
+        </p>
 
         <div className="mt-auto flex items-end justify-between gap-4 pt-4">
           <div>
@@ -76,15 +104,20 @@ export default function TarjetaEvento({ evento }: { evento: EventoConCupo }) {
             </p>
             <p
               className={cn(
-                "text-sm",
+                "flex items-center gap-1.5 text-sm",
                 evento.agotado ? "text-vino" : "text-tinta-suave",
               )}
             >
+              <Users className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
               {evento.cupoRestante === null
                 ? "Cupo abierto"
                 : evento.agotado
                   ? "Cupo lleno"
-                  : `${evento.cupoRestante} lugares disponibles`}
+                  : `${evento.cupoRestante} ${
+                      evento.cupoRestante === 1
+                        ? "lugar disponible"
+                        : "lugares disponibles"
+                    }`}
             </p>
           </div>
 

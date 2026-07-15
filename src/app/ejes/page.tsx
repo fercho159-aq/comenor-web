@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { ArrowUpRight, Target } from "lucide-react";
+
 import { Revelar, RevelarGrupo } from "@/components/anim";
 import { Contenedor, Eyebrow, Foto, Pill, TarjetaSolida, Titulo } from "@/components/ui";
 
@@ -200,7 +202,10 @@ export default function EjesPage() {
               className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8"
             >
               <Pill tamano="lg" className="self-start sm:self-auto">
-                Objetivo
+                <span className="inline-flex items-center gap-2">
+                  <Target className="size-5" strokeWidth={1.75} aria-hidden />
+                  Objetivo
+                </span>
               </Pill>
               <p className="text-titulo max-w-3xl text-pretty text-tinta">{eje.objetivo}</p>
             </Revelar>
@@ -217,6 +222,7 @@ export default function EjesPage() {
                   <TarjetaSolida
                     titulo={linea}
                     variante={indice % 2 === 0 ? "verde-700" : "verde-900"}
+                    glifo={<ArrowUpRight className="size-6" strokeWidth={1.75} />}
                     className={CLASE_LINEA}
                   />
                 </li>

@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import {
+  BadgeCheck,
+  BookMarked,
+  Building2,
+  CircuitBoard,
+  Factory,
+  Flame,
+  Globe,
+  Handshake,
+  Landmark,
+  Shirt,
+  type LucideIcon,
+} from "lucide-react";
 import { Boton, Contenedor, Eyebrow, Pill, TarjetaSolida, Titulo } from "@/components/ui";
 import { Revelar, RevelarGrupo } from "@/components/anim";
 import { TarjetaClara } from "./_componentes/tarjetas";
@@ -19,21 +32,45 @@ const PILARES = [
 
 /** Mandato Estatutario — slide 05. */
 const MANDATO = [
-  "Armonización con ISO · IEC · CODEX y organismos internacionales",
-  "Acuerdos de reconocimiento mutuo bilateral y multilateral",
-  "Interlocutor ante los tres Poderes del Estado Mexicano",
-  "Catálogo Nacional de NMX, NOM y Estándares actualizado",
-] as const;
+  {
+    icono: Globe,
+    texto: "Armonización con ISO · IEC · CODEX y organismos internacionales",
+  },
+  {
+    icono: Handshake,
+    texto: "Acuerdos de reconocimiento mutuo bilateral y multilateral",
+  },
+  {
+    icono: Landmark,
+    texto: "Interlocutor ante los tres Poderes del Estado Mexicano",
+  },
+  {
+    icono: BookMarked,
+    texto: "Catálogo Nacional de NMX, NOM y Estándares actualizado",
+  },
+] as const satisfies ReadonlyArray<{ icono: LucideIcon; texto: string }>;
 
 /** Arquitectura técnica — slide 06. */
 const ORGANISMOS = [
-  { siglas: "ONNCCE", ambito: "Construcción y obra civil" },
-  { siglas: "INNTEX", ambito: "Textiles y equipo de protección personal" },
-  { siglas: "NYCE", ambito: "Electrónica / TIC / Química" },
-  { siglas: "IMNC (IMEEC)", ambito: "Multisector ISO / Sistemas de gestión" },
-  { siglas: "ULSE", ambito: "Seguridad contra incendios" },
-  { siglas: "CANACERO", ambito: "Siderurgia y acero" },
-] as const;
+  { siglas: "ONNCCE", ambito: "Construcción y obra civil", icono: Building2 },
+  {
+    siglas: "INNTEX",
+    ambito: "Textiles y equipo de protección personal",
+    icono: Shirt,
+  },
+  { siglas: "NYCE", ambito: "Electrónica / TIC / Química", icono: CircuitBoard },
+  {
+    siglas: "IMNC (IMEEC)",
+    ambito: "Multisector ISO / Sistemas de gestión",
+    icono: BadgeCheck,
+  },
+  { siglas: "ULSE", ambito: "Seguridad contra incendios", icono: Flame },
+  { siglas: "CANACERO", ambito: "Siderurgia y acero", icono: Factory },
+] as const satisfies ReadonlyArray<{
+  siglas: string;
+  ambito: string;
+  icono: LucideIcon;
+}>;
 
 /** Franja de logos de la slide 06. Dimensiones intrínsecas de public/media/normatividad/. */
 const LOGOS = [
@@ -105,14 +142,22 @@ export default function NormatividadPage() {
               Mandato Estatutario (Estatutos COMENOR, reformados julio 2024)
             </h2>
             <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {MANDATO.map((punto) => (
-                <li
-                  key={punto}
-                  className="text-cuerpo border-vino border-l-2 pl-4 text-salvia text-pretty"
-                >
-                  {punto}
-                </li>
-              ))}
+              {MANDATO.map((punto) => {
+                const IconoMandato = punto.icono;
+                return (
+                  <li
+                    key={punto.texto}
+                    className="text-cuerpo border-vino border-l-2 pl-4 text-salvia text-pretty"
+                  >
+                    <IconoMandato
+                      className="mb-3 size-6 text-blanco"
+                      strokeWidth={1.5}
+                      aria-hidden
+                    />
+                    {punto.texto}
+                  </li>
+                );
+              })}
             </ul>
           </Revelar>
         </Contenedor>
@@ -133,16 +178,20 @@ export default function NormatividadPage() {
             as="ul"
             className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3"
           >
-            {ORGANISMOS.map((organismo, indice) => (
-              <li key={organismo.siglas}>
-                <TarjetaSolida
-                  variante={indice % 2 === 0 ? "verde-700" : "verde-900"}
-                  titulo={organismo.siglas}
-                  descripcion={organismo.ambito}
-                  className="justify-center"
-                />
-              </li>
-            ))}
+            {ORGANISMOS.map((organismo, indice) => {
+              const IconoSector = organismo.icono;
+              return (
+                <li key={organismo.siglas}>
+                  <TarjetaSolida
+                    variante={indice % 2 === 0 ? "verde-700" : "verde-900"}
+                    titulo={organismo.siglas}
+                    descripcion={organismo.ambito}
+                    glifo={<IconoSector className="size-8" strokeWidth={1.5} />}
+                    className="justify-center"
+                  />
+                </li>
+              );
+            })}
           </RevelarGrupo>
 
           <Revelar

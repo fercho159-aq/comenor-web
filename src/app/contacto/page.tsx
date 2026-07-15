@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Mail, Phone } from "lucide-react";
 import { Contenedor, TarjetaSolida, Titulo } from "@/components/ui";
 import { Revelar, RevelarGrupo } from "@/components/anim";
 import FormularioContacto from "./FormularioContacto";
@@ -13,46 +14,6 @@ const CORREO = "direccioncomenor@comenor.org.mx";
 const TELEFONO = "55 2745 3035";
 const TELEFONO_E164 = "+525527453035";
 
-/** Sobre del icono de la tarjeta "Mail" (slide 15). */
-function IconoSobre() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-7"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="2.5" y="4.5" width="19" height="15" rx="2" />
-      <path d="m3.5 6.5 8.5 6.5 8.5-6.5" />
-    </svg>
-  );
-}
-
-/** Auricular con ondas de la tarjeta "Teléfono & WhatsApp" (slide 15). */
-function IconoTelefono() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-7"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M6.5 3.5 4 6c-.7.7-.9 1.7-.6 2.6a20 20 0 0 0 11.9 11.9c.9.3 1.9.1 2.6-.6l2.5-2.5-4-3-2 1.6a15.5 15.5 0 0 1-6.4-6.4l1.6-2z" />
-      <path d="M14 3.5a6.5 6.5 0 0 1 6.5 6.5" />
-      <path d="M14 7a3 3 0 0 1 3 3" />
-    </svg>
-  );
-}
 
 export default function ContactoPage() {
   return (
@@ -68,7 +29,7 @@ export default function ContactoPage() {
           <TarjetaSolida
             variante="verde-700"
             titulo="Mail"
-            icono={<IconoSobre />}
+            icono={<Mail className="size-7" strokeWidth={1.75} aria-hidden />}
             className="justify-center py-10"
             descripcion={
               <a
@@ -83,7 +44,7 @@ export default function ContactoPage() {
           <TarjetaSolida
             variante="verde-900"
             titulo="Teléfono & WhatsApp"
-            icono={<IconoTelefono />}
+            icono={<Phone className="size-7" strokeWidth={1.75} aria-hidden />}
             className="justify-center py-10"
             descripcion={
               <a
