@@ -22,15 +22,13 @@ type ItemNav =
  * (el contenedor reserva 80px a la derecha para la barra lateral vertical),
  * así que Normatividad / Ejes temáticos / Código de ética viven bajo un
  * desplegable accesible. Ninguna página queda fuera de la navegación.
- *
- * TODO: reactivar el enlace a /eventos cuando exista la página
- * (módulo de calendario, fase 2). Hasta entonces no se enlaza: enviaba a un 404.
  */
 const ITEMS: readonly ItemNav[] = [
   { tipo: "enlace", href: "/", etiqueta: "Inicio" },
   { tipo: "enlace", href: "/nosotros", etiqueta: "Nosotros" },
   { tipo: "enlace", href: "/consejo-directivo", etiqueta: "Consejo Directivo" },
   { tipo: "enlace", href: "/asociados", etiqueta: "Asociados" },
+  { tipo: "enlace", href: "/eventos", etiqueta: "Eventos" },
   {
     tipo: "grupo",
     etiqueta: "Nuestro trabajo",

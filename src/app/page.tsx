@@ -371,12 +371,14 @@ export default function PaginaInicio() {
             <div className="tema-oscuro bg-verde-900 flex flex-col justify-center gap-4 p-8 sm:p-10">
               <h3 className="text-blanco text-xl font-bold">Próximos eventos</h3>
               <p className="text-cuerpo text-salvia text-pretty">
-                Aún no hay eventos publicados. Aquí aparecerán las próximas
-                sesiones, foros y convocatorias de COMENOR en cuanto se anuncien.
+                Consulta el calendario de sesiones, foros y convocatorias de
+                COMENOR, y regístrate en línea.
               </p>
-              {/* TODO: restituir el CTA <Boton href="/eventos"> cuando exista el
-                  módulo de calendario (fase 2). Hoy /eventos no existe: un enlace
-                  aquí sería un 404. */}
+              <div className="mt-2 flex">
+                <Boton href="/eventos" variante="sobre-oscuro">
+                  Ver la agenda
+                </Boton>
+              </div>
             </div>
           </div>
         </Contenedor>

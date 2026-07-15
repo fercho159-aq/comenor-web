@@ -58,14 +58,12 @@ const REDES: readonly Red[] = [
 /*
  * Mapa completo del sitio: el pie enlaza las siete páginas internas, incluidas
  * las que en escritorio viven dentro del desplegable «Nuestro trabajo».
- *
- * TODO: reactivar el enlace a /eventos cuando exista la página
- * (módulo de calendario, fase 2). Hasta entonces no se enlaza: enviaba a un 404.
  */
 const ENLACES_SITIO: readonly { href: string; etiqueta: string }[] = [
   { href: "/nosotros", etiqueta: "Nosotros" },
   { href: "/consejo-directivo", etiqueta: "Consejo Directivo" },
   { href: "/asociados", etiqueta: "Asociados y miembros" },
+  { href: "/eventos", etiqueta: "Eventos" },
   { href: "/normatividad", etiqueta: "Normatividad" },
   { href: "/ejes", etiqueta: "Ejes temáticos" },
   { href: "/codigo-etica", etiqueta: "Código de ética" },
