@@ -97,7 +97,7 @@ export default async function AdminInicioPage() {
       etiquetaConteo: "registros",
     },
     {
-      href: "/admin/check-in",
+      href: "/admin/registros/checkin",
       titulo: "Check-in",
       descripcion: "Validación de asistentes por código QR en el acceso.",
     },
@@ -108,11 +108,8 @@ export default async function AdminInicioPage() {
       conteo: c.galerias,
       etiquetaConteo: "galerías",
     },
-    {
-      href: "/admin/aniversario",
-      titulo: "Aniversario",
-      descripcion: "Contenido conmemorativo del aniversario de COMENOR.",
-    },
+    // TODO: tarjeta "Aniversario" pendiente hasta construir /admin/aniversario
+    // (contenido conmemorativo pendiente del cliente).
     {
       href: "/admin/notificaciones",
       titulo: "Destinatarios",

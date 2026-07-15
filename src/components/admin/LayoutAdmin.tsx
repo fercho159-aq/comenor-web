@@ -36,9 +36,10 @@ const NAV: ReadonlyArray<EnlaceNav> = [
   { href: "/admin/documentos", etiqueta: "Documentos" },
   { href: "/admin/eventos", etiqueta: "Eventos" },
   { href: "/admin/registros", etiqueta: "Registros" },
-  { href: "/admin/check-in", etiqueta: "Check-in" },
+  { href: "/admin/registros/checkin", etiqueta: "Check-in" },
   { href: "/admin/memorias", etiqueta: "Memorias" },
-  { href: "/admin/aniversario", etiqueta: "Aniversario" },
+  // TODO: reactivar "Aniversario" cuando exista /admin/aniversario (pendiente
+  // de contenido del cliente). Enlazarlo ahora daba 404.
   { href: "/admin/destinatarios", etiqueta: "Destinatarios" },
 ];
 
