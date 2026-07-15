@@ -18,6 +18,7 @@ import {
   obtenerDocumento,
 } from "@/lib/notificaciones/consultas";
 import { enviarNotificacionDocumento } from "@/lib/notificaciones/enviar";
+import { siteUrl } from "@/lib/net/site-url";
 
 /** Cuerpo esperado: el id del documento ya subido a notificar. */
 const notificarDocumentoSchema = z.object({
@@ -68,11 +69,12 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  // 4. Destinatarios y envío. La URL se arma con el origen de la petición
-  //    (el micrositio está protegido en el proxy bajo /miembros).
+  // 4. Destinatarios y envío. La URL se arma con el dominio canónico (siteUrl),
+  //    nunca con el origen de la petición: un admin operando desde un alias de
+  //    preview (*.vercel.app) sembraría enlaces con dominio equivocado en los
+  //    correos a los miembros.
   const destinatarios = await obtenerDestinatariosActivos();
-  const origen = new URL(request.url).origin;
-  const urlAcceso = `${origen}/miembros/documentos/${documento.id}`;
+  const urlAcceso = `${siteUrl()}/miembros/documentos/${documento.id}`;
 
   const { enviados } = await enviarNotificacionDocumento(destinatarios, {
     documentoTitulo: documento.titulo,

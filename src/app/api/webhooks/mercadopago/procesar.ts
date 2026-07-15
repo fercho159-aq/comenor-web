@@ -186,20 +186,33 @@ export async function procesarPago(
       payload: payloadCrudo,
     });
 
-    await deps.enviarConfirmacion({
-      correo: registro.correo,
-      nombre: registro.nombre,
-      folio: registro.id,
-      montoCentavos: pago.montoCentavos,
-      token,
-      evento: {
-        nombre: evento.nombre,
-        fecha: evento.fecha,
-        sede: evento.sede,
-        modalidad: evento.modalidad,
-        slug: evento.slug,
-      },
-    });
+    // Best-effort: el pago YA quedó reclamado (marcarAprobado). Si el correo
+    // falla, NO relanzamos: un 500 haría reintentar a MP, pero el reintento
+    // afecta 0 filas (ya aprobado) y nunca reenviaría el QR → el asistente
+    // pagaría y se quedaría sin correo. Se registra el fallo para reenvío manual
+    // desde el panel admin. El QR (hash) ya está en BD; el token se puede
+    // regenerar (es determinista: HMAC de registrationId+eventId).
+    try {
+      await deps.enviarConfirmacion({
+        correo: registro.correo,
+        nombre: registro.nombre,
+        folio: registro.id,
+        montoCentavos: pago.montoCentavos,
+        token,
+        evento: {
+          nombre: evento.nombre,
+          fecha: evento.fecha,
+          sede: evento.sede,
+          modalidad: evento.modalidad,
+          slug: evento.slug,
+        },
+      });
+    } catch (error) {
+      console.error(
+        `[webhook] pago ${paymentId} aprobado pero el correo de confirmación falló para el registro ${registrationId}; requiere reenvío manual:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
 
     return { estado: "aprobado", registrationId };
   }

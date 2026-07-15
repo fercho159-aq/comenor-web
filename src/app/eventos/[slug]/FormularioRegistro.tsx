@@ -72,6 +72,9 @@ export default function FormularioRegistro({
 }) {
   const idBase = useId();
   const [estado, setEstado] = useState<EstadoEnvio>({ tipo: "inactivo" });
+  // Valor real del honeypot: controlado para poder enviarlo (un input sin leer
+  // hacía la trampa inútil).
+  const [honeypot, setHoneypot] = useState("");
 
   const {
     register,
@@ -103,7 +106,7 @@ export default function FormularioRegistro({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // El honeypot viaja vacío desde un humano; los bots lo llenan.
-        body: JSON.stringify({ ...datos, [CAMPO_HONEYPOT]: "" }),
+        body: JSON.stringify({ ...datos, [CAMPO_HONEYPOT]: honeypot }),
       });
 
       const cuerpo: RespuestaRegistro = await respuesta.json();
@@ -205,6 +208,8 @@ export default function FormularioRegistro({
           name={CAMPO_HONEYPOT}
           tabIndex={-1}
           autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
         />
       </div>
 

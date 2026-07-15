@@ -103,8 +103,9 @@ export default function FormularioContacto() {
 
   return (
     <form noValidate onSubmit={handleSubmit(enviar)} className="mt-10">
-      {/* Honeypot: invisible y fuera del tab order; solo un bot lo llena. */}
-      <div aria-hidden="true" className="hidden">
+      {/* Honeypot: fuera de pantalla (no display:none, que los bots modernos
+          saltan) y fuera del tab order; solo un bot lo llena. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px" }}>
         <label htmlFor="sitio_web">No llenar este campo</label>
         <input
           type="text"

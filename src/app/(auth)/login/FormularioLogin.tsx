@@ -55,9 +55,9 @@ export default function FormularioLogin({ next }: FormularioLoginProps) {
     <form action={accion} onSubmit={validarEnCliente} noValidate className="mt-8">
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
-      {/* Honeypot: invisible y fuera del tab order. Un humano nunca lo llena;
-          un bot sí. El servidor rechaza si viene con valor. */}
-      <div aria-hidden="true" className="hidden">
+      {/* Honeypot: fuera de pantalla (no display:none, que los bots modernos
+          saltan) y fuera del tab order. Un humano nunca lo llena; un bot sí. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px" }}>
         <label htmlFor="sitio_web">No llenar este campo</label>
         <input
           type="text"
