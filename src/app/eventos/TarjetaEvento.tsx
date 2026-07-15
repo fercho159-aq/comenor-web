@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 
-import { Boton, Foto, cn } from "@/components/ui";
+import { Boton, cn } from "@/components/ui";
 
 import type { EventoConCupo } from "./_datos";
 import {
@@ -25,14 +26,26 @@ export default function TarjetaEvento({ evento }: { evento: EventoConCupo }) {
     <article className="flex h-full flex-col overflow-hidden bg-blanco shadow-sm ring-1 ring-tinta-suave/15">
       <Link href={href} className="group block" aria-label={evento.nombre}>
         {esImagenUsable ? (
-          <Foto
-            fill
-            src={evento.imagenPath as string}
-            alt=""
-            variante="redonda"
-            className="aspect-[16/9] w-full rounded-none"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
+          // Marco a prueba de cualquier proporción: el fondo es la misma imagen
+          // ampliada y difuminada (rellena sin barras vacías) y el primer plano
+          // va COMPLETO (object-contain), sin recortar carteles ni su texto.
+          <div className="relative aspect-[16/9] w-full overflow-hidden bg-verde-900">
+            <Image
+              src={evento.imagenPath as string}
+              alt=""
+              aria-hidden
+              fill
+              className="scale-110 object-cover opacity-55 blur-xl"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            <Image
+              src={evento.imagenPath as string}
+              alt=""
+              fill
+              className="object-contain"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          </div>
         ) : (
           <div
             aria-hidden="true"

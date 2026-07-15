@@ -189,11 +189,13 @@ describe("validarEvento", () => {
 });
 
 describe("procesarImagenEvento (sharp)", () => {
-  it("recorta a 16:9 y recomprime a WebP", async () => {
+  it("ajusta dentro del cuadro máximo SIN recortar y recomprime a WebP", async () => {
+    // Cartel vertical: debe conservar su proporción (sin corte), limitado por el
+    // lado mayor (alto) a 1600 px.
     const origen = await sharp({
       create: {
         width: 2000,
-        height: 1000,
+        height: 2800,
         channels: 3,
         background: { r: 180, g: 36, b: 56 },
       },
@@ -205,8 +207,10 @@ describe("procesarImagenEvento (sharp)", () => {
     const meta = await sharp(Buffer.from(salida)).metadata();
 
     expect(meta.format).toBe("webp");
-    expect(meta.width).toBe(1200);
-    expect(meta.height).toBe(675);
+    // Proporción original 2000:2800 preservada (sin recorte a 16:9); el lado
+    // mayor (alto) se limita a 1600 y el ancho escala en proporción.
+    expect(meta.width).toBe(1143);
+    expect(meta.height).toBe(1600);
   });
 
   it("lanza si los bytes están vacíos", async () => {

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Boton, Contenedor, Eyebrow, Foto, Pill, Titulo } from "@/components/ui";
+import Image from "next/image";
+import { Boton, Contenedor, Eyebrow, Pill, Titulo } from "@/components/ui";
 
 import { buscarEventoPublicadoPorSlug, type EventoConCupo } from "../_datos";
 import {
@@ -129,14 +130,26 @@ export default async function EventoDetallePage({ params }: Params) {
           {/* Columna visual + datos */}
           <div>
             {esImagen ? (
-              <Foto
-                fill
-                src={evento.imagenPath as string}
-                alt=""
-                className="aspect-[16/9] w-full"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
+              // Mismo marco a prueba de proporción que la tarjeta: fondo
+              // difuminado + cartel completo sin recortar.
+              <div className="rounded-foto relative aspect-[16/9] w-full overflow-hidden bg-verde-900">
+                <Image
+                  src={evento.imagenPath as string}
+                  alt=""
+                  aria-hidden
+                  fill
+                  className="scale-110 object-cover opacity-55 blur-xl"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <Image
+                  src={evento.imagenPath as string}
+                  alt={evento.nombre}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              </div>
             ) : (
               <div
                 aria-hidden="true"
