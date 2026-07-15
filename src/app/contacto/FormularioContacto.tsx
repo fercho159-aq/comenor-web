@@ -29,6 +29,9 @@ const CLASES_CAMPO =
 export default function FormularioContacto() {
   const idBase = useId();
   const [estado, setEstado] = useState<EstadoEnvio>({ tipo: "inactivo" });
+  // Honeypot: debe coincidir con CAMPO_HONEYPOT de @/lib/ratelimit ("sitio_web").
+  // Se usa el literal para no arrastrar el módulo de rate-limit al bundle cliente.
+  const [honeypot, setHoneypot] = useState("");
 
   const {
     register,
@@ -58,7 +61,7 @@ export default function FormularioContacto() {
       const respuesta = await fetch("/api/contacto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos),
+        body: JSON.stringify({ ...datos, sitio_web: honeypot }),
       });
 
       const cuerpo: RespuestaContacto = await respuesta.json();
@@ -100,6 +103,20 @@ export default function FormularioContacto() {
 
   return (
     <form noValidate onSubmit={handleSubmit(enviar)} className="mt-10">
+      {/* Honeypot: invisible y fuera del tab order; solo un bot lo llena. */}
+      <div aria-hidden="true" className="hidden">
+        <label htmlFor="sitio_web">No llenar este campo</label>
+        <input
+          type="text"
+          id="sitio_web"
+          name="sitio_web"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
+
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label htmlFor={idDe("nombre")} className="font-bold text-verde">

@@ -176,12 +176,23 @@ export const paymentsLog = pgTable(
       .notNull()
       .references(() => registrations.id, { onDelete: "restrict" }),
     mpEvent: text("mp_event").notNull(),
+    // Idempotencia de webhooks MP (PLAN 2.3): permite deduplicar por pago y
+    // distinguir dos notificaciones del mismo payment_id. Nullable porque no
+    // toda entrada de bitácora proviene de un pago (p. ej. eventos gratuitos).
+    mpPaymentId: text("mp_payment_id"),
     payloadJson: jsonb("payload_json").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("payments_log_registration_id_idx").on(table.registrationId)],
+  (table) => [
+    index("payments_log_registration_id_idx").on(table.registrationId),
+    // Una notificación (mpEvent) por payment_id: segundo webhook idéntico choca.
+    uniqueIndex("payments_log_mp_payment_event_idx").on(
+      table.mpPaymentId,
+      table.mpEvent,
+    ),
+  ],
 );
 
 /** Galerías fotográficas (Memorias). */
