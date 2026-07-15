@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
+import { Revelar, RevelarGrupo } from "@/components/anim";
 import { Contenedor, Eyebrow, Pill, Titulo } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -207,26 +208,34 @@ export default function AsociadosPage() {
       <Titulo as="h1" className="mt-3 max-w-4xl">
         Nuestros asociados y miembros
       </Titulo>
-      <p className="mt-6 max-w-3xl text-cuerpo text-tinta">
+      <Revelar as="p" y={16} className="mt-6 max-w-3xl text-cuerpo text-tinta">
         Estamos integrados por algunos de los actores más relevantes del ecosistema de la
         calidad, entre ellos Organismos Nacionales de Normalización, Organismos Nacionales de
         Certificación de Productos y Sistemas de Gestión, Laboratorios de Ensayo y Unidades de
         Verificación de Información Comercial e Instalaciones Eléctricas.
-      </p>
+      </Revelar>
 
       <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-x-8 lg:mt-16 lg:grid-cols-4 lg:gap-x-6">
         {CATEGORIAS.map((categoria) => (
           <section key={categoria.id} aria-labelledby={categoria.id}>
             {/* min-h iguala la altura de las pills de 1 y 2 líneas para que los
                 grids de logos arranquen a la misma altura en la vista de 4 columnas. */}
-            <h2 id={categoria.id} className="flex items-stretch lg:min-h-[4.75rem]">
-              <Pill className="w-full px-6 py-3 leading-snug">{categoria.titulo}</Pill>
-            </h2>
-            <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+            <Revelar y={16}>
+              <h2 id={categoria.id} className="flex items-stretch lg:min-h-[4.75rem]">
+                <Pill className="w-full px-6 py-3 leading-snug">{categoria.titulo}</Pill>
+              </h2>
+            </Revelar>
+            <RevelarGrupo
+              as="ul"
+              stagger={0.06}
+              delay={0.15}
+              y={16}
+              className="mt-6 grid grid-cols-2 gap-3 sm:gap-4"
+            >
               {categoria.logos.map((logo, indice) => (
                 <TarjetaLogo key={`${categoria.id}-${logo.archivo}-${indice}`} logo={logo} />
               ))}
-            </ul>
+            </RevelarGrupo>
           </section>
         ))}
       </div>

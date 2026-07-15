@@ -10,6 +10,7 @@ import {
   TarjetaSolida,
   Titulo,
 } from "@/components/ui";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 
 export const metadata: Metadata = {
   title: "Inicio",
@@ -215,7 +216,7 @@ export default function PaginaInicio() {
       </section>
 
       {/* ——— ¿Quiénes somos? (slides 02 y 05) ——————————————————————— */}
-      <section className="py-16 lg:py-24">
+      <Revelar as="section" className="py-16 lg:py-24">
         <Contenedor>
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
@@ -262,10 +263,10 @@ export default function PaginaInicio() {
             />
           </div>
         </Contenedor>
-      </section>
+      </Revelar>
 
       {/* ——— Ecosistema: arquitectura técnica (slide 06) —————————————— */}
-      <section className="py-16 lg:py-24">
+      <Revelar as="section" className="py-16 lg:py-24">
         <Contenedor>
           <Eyebrow>Nuestro ecosistema</Eyebrow>
           <Titulo as="h2" className="mt-3 max-w-[26ch] break-words">
@@ -276,7 +277,10 @@ export default function PaginaInicio() {
             estandarización
           </Titulo>
 
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3">
+          <RevelarGrupo
+            as="ul"
+            className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3"
+          >
             {ORGANISMOS.map((organismo, indice) => (
               <li key={organismo.nombre}>
                 <TarjetaSolida
@@ -286,12 +290,12 @@ export default function PaginaInicio() {
                 />
               </li>
             ))}
-          </ul>
+          </RevelarGrupo>
         </Contenedor>
-      </section>
+      </Revelar>
 
       {/* ——— Asociados y miembros (slide 04) ————————————————————————— */}
-      <section className="py-16 lg:py-24">
+      <Revelar as="section" className="py-16 lg:py-24">
         <Contenedor ancho="ancho">
           <Eyebrow>Nuestra institución</Eyebrow>
           <Titulo as="h2" className="mt-3">
@@ -306,7 +310,11 @@ export default function PaginaInicio() {
             ))}
           </ul>
 
-          <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:mt-14 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-12">
+          <RevelarGrupo
+            as="ul"
+            stagger={0.05}
+            className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:mt-14 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-12"
+          >
             {LOGOS_ASOCIADOS.map((logo) => (
               <li
                 key={logo.archivo}
@@ -322,7 +330,7 @@ export default function PaginaInicio() {
                 />
               </li>
             ))}
-          </ul>
+          </RevelarGrupo>
 
           <div className="mt-12">
             <Boton href="/asociados" variante="secundario">
@@ -330,10 +338,10 @@ export default function PaginaInicio() {
             </Boton>
           </div>
         </Contenedor>
-      </section>
+      </Revelar>
 
       {/* ——— Agenda y próximos eventos (slide 08) ———————————————————— */}
-      <section className="py-16 lg:py-24">
+      <Revelar as="section" className="py-16 lg:py-24">
         <Contenedor>
           <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
             <div>
@@ -372,10 +380,10 @@ export default function PaginaInicio() {
             </div>
           </div>
         </Contenedor>
-      </section>
+      </Revelar>
 
       {/* ——— Contacto (slide 15) ——————————————————————————————————— */}
-      <section className="py-16 lg:py-24">
+      <Revelar as="section" className="py-16 lg:py-24">
         <Contenedor>
           <Eyebrow>Conecta con nosotros</Eyebrow>
           <Titulo as="h2" className="mt-3">
@@ -416,7 +424,7 @@ export default function PaginaInicio() {
             </Boton>
           </div>
         </Contenedor>
-      </section>
+      </Revelar>
     </>
   );
 }

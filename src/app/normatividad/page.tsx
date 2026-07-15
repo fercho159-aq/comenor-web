@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Boton, Contenedor, Eyebrow, Pill, TarjetaSolida, Titulo } from "@/components/ui";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 import { TarjetaClara } from "./_componentes/tarjetas";
 
 export const metadata: Metadata = {
@@ -65,7 +66,7 @@ export default function NormatividadPage() {
             calidad.
           </Titulo>
 
-          <div className="mt-10 grid gap-6 lg:mt-14 lg:grid-cols-2 lg:items-start">
+          <Revelar className="mt-10 grid gap-6 lg:mt-14 lg:grid-cols-2 lg:items-start">
             <div className="flex h-full flex-col justify-center gap-5 bg-blanco/70 p-6 sm:p-8">
               <p className="text-cuerpo text-tinta text-pretty">
                 Somos el organismo paraguas que representa y articula el
@@ -96,10 +97,10 @@ export default function NormatividadPage() {
                 />
               ))}
             </div>
-          </div>
+          </Revelar>
 
           {/* La banda del Mandato Estatutario es verde-700 (#0C5753) en la slide 05. */}
-          <div className="mt-6 bg-verde-700 p-6 sm:p-8">
+          <Revelar className="mt-6 bg-verde-700 p-6 sm:p-8">
             <h2 className="text-center text-base font-bold text-blanco sm:text-lg">
               Mandato Estatutario (Estatutos COMENOR, reformados julio 2024)
             </h2>
@@ -113,20 +114,25 @@ export default function NormatividadPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Revelar>
         </Contenedor>
       </section>
 
       {/* ——— Slide 06: arquitectura técnica ——— */}
       <section className="py-16 lg:py-20">
         <Contenedor>
-          <Eyebrow>Nuestro ecosistema</Eyebrow>
-          <Titulo as="h2" className="mt-3 max-w-[22ch]">
-            La arquitectura técnica que representa COMENOR en
-            normalización/estandarización
-          </Titulo>
+          <Revelar>
+            <Eyebrow>Nuestro ecosistema</Eyebrow>
+            <Titulo as="h2" className="mt-3 max-w-[22ch]">
+              La arquitectura técnica que representa COMENOR en
+              normalización/estandarización
+            </Titulo>
+          </Revelar>
 
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3">
+          <RevelarGrupo
+            as="ul"
+            className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3"
+          >
             {ORGANISMOS.map((organismo, indice) => (
               <li key={organismo.siglas}>
                 <TarjetaSolida
@@ -137,9 +143,12 @@ export default function NormatividadPage() {
                 />
               </li>
             ))}
-          </ul>
+          </RevelarGrupo>
 
-          <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:gap-x-14">
+          <Revelar
+            as="ul"
+            className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:gap-x-14"
+          >
             {LOGOS.map((logo) => (
               <li key={logo.src}>
                 <Image
@@ -152,7 +161,7 @@ export default function NormatividadPage() {
                 />
               </li>
             ))}
-          </ul>
+          </Revelar>
         </Contenedor>
       </section>
 
@@ -164,7 +173,7 @@ export default function NormatividadPage() {
       */}
       <section className="py-16 lg:py-20">
         <Contenedor>
-          <div className="tema-oscuro flex flex-col items-start gap-6 bg-verde p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+          <Revelar className="tema-oscuro flex flex-col items-start gap-6 bg-verde p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
             <div className="flex flex-col items-start gap-4">
               <Eyebrow variante="sobre-oscuro">Nuestro ecosistema</Eyebrow>
               <h2 className="text-titulo text-blanco text-balance">
@@ -185,14 +194,14 @@ export default function NormatividadPage() {
             >
               Ver los 10 principios
             </Boton>
-          </div>
+          </Revelar>
         </Contenedor>
       </section>
 
       {/* ——— Tienda de normas ASTM (vive en el sitio anterior) ——— */}
       <section className="pb-20">
         <Contenedor>
-          <div className="tema-oscuro flex flex-col items-start gap-6 bg-verde-900 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+          <Revelar className="tema-oscuro flex flex-col items-start gap-6 bg-verde-900 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col items-start gap-4">
               <Pill variante="verde">Tienda de normas</Pill>
               <h2 className="text-titulo text-blanco text-balance">
@@ -214,7 +223,7 @@ export default function NormatividadPage() {
               Ir a la tienda de normas
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
             </Boton>
-          </div>
+          </Revelar>
         </Contenedor>
       </section>
     </>

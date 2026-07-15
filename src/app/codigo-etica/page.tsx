@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Contenedor, Eyebrow, Titulo, cn } from "@/components/ui";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 
 export const metadata: Metadata = {
   title: "Código de Ética",
@@ -75,7 +76,7 @@ export default function CodigoEticaPage() {
       </Titulo>
 
       <div className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-[2fr_1fr] lg:gap-8">
-        <ol className="grid gap-4 sm:grid-cols-2">
+        <RevelarGrupo as="ol" className="grid gap-4 sm:grid-cols-2">
           {PRINCIPIOS.map((principio) => (
             <TarjetaPrincipio
               key={principio.numeral}
@@ -84,9 +85,12 @@ export default function CodigoEticaPage() {
               destacada={principio.numeral === "I"}
             />
           ))}
-        </ol>
+        </RevelarGrupo>
 
-        <aside className="tema-oscuro flex flex-col items-center justify-between gap-8 bg-verde px-6 py-10 text-center sm:px-8">
+        <Revelar
+          as="aside"
+          className="tema-oscuro flex flex-col items-center justify-between gap-8 bg-verde px-6 py-10 text-center sm:px-8"
+        >
           <h2 className="text-titulo text-balance text-blanco">
             Código de Ética y Conducta Profesional
           </h2>
@@ -104,7 +108,7 @@ export default function CodigoEticaPage() {
               Art. 2 — Código de Ética COMENOR, 2025
             </p>
           </div>
-        </aside>
+        </Revelar>
       </div>
     </Contenedor>
   );

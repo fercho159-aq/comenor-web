@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 import { Contenedor, Eyebrow, Foto, Titulo } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default function NosotrosPage() {
       {/* ——— Slide 02: ¿Quiénes somos? ——— */}
       <Contenedor as="section" className="py-16 lg:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div>
+          <Revelar>
             <Eyebrow>Nuestra institución</Eyebrow>
             <Titulo as="h1" className="mt-4">
               ¿Quiénes somos?
@@ -45,7 +46,7 @@ export default function NosotrosPage() {
                 través de la normalización y la evaluación de la conformidad.
               </p>
             </div>
-          </div>
+          </Revelar>
 
           <Foto
             src="/media/nosotros/consejo-comenor-foto-grupal.jpg"
@@ -61,7 +62,7 @@ export default function NosotrosPage() {
 
       {/* ——— Slide 08: Agenda COMENOR ——— */}
       <Contenedor as="section" className="pb-20 lg:pb-28">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <RevelarGrupo className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <Eyebrow>Nuestro trabajo</Eyebrow>
             <Titulo as="h2" className="mt-4">
@@ -92,7 +93,7 @@ export default function NosotrosPage() {
             sizes="(min-width: 1024px) 44vw, 100vw"
             className="aspect-[4/3] w-full lg:order-last"
           />
-        </div>
+        </RevelarGrupo>
       </Contenedor>
     </>
   );

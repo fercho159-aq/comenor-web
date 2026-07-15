@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Contenedor, Eyebrow, Foto, Titulo } from "@/components/ui";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 
 export const metadata: Metadata = {
   title: "Consejo Directivo",
@@ -140,9 +141,11 @@ export default function ConsejoDirectivoPage() {
 
       {/* ——— Organigrama (≥1024px): jerarquía con líneas conectoras verdes ——— */}
       <div className="mt-14 hidden lg:block">
-        {/* Nivel 1 — Presidencia */}
+        {/* Nivel 1 — Presidencia (reveal mínimo: no penalizar LCP del retrato prioritario) */}
         <div className="flex justify-center">
-          <NodoOrganigrama integrante={presidente} prioridad />
+          <Revelar y={12} duracion={0.4}>
+            <NodoOrganigrama integrante={presidente} prioridad />
+          </Revelar>
         </div>
 
         {/* Nivel 2 — Dirección General: línea punteada (relación de staff, slide 03) */}
@@ -154,7 +157,9 @@ export default function ConsejoDirectivoPage() {
           />
           <div className="relative grid grid-cols-2 pt-10 pb-4">
             <div className="flex items-start">
-              <NodoOrganigrama integrante={direccionGeneral} />
+              <Revelar delay={0.1}>
+                <NodoOrganigrama integrante={direccionGeneral} />
+              </Revelar>
               <div
                 aria-hidden
                 className="mt-[4.5rem] h-0 flex-1 border-t-2 border-dashed border-verde"
@@ -178,13 +183,13 @@ export default function ConsejoDirectivoPage() {
         </div>
 
         {/* Nivel 3 — Secretaría, Vicepresidencias y Tesorería */}
-        <ul className="grid grid-cols-4">
+        <RevelarGrupo as="ul" delay={0.15} className="grid grid-cols-4">
           {consejo.map((integrante) => (
             <li key={integrante.nombre} className="flex justify-center">
               <NodoOrganigrama integrante={integrante} />
             </li>
           ))}
-        </ul>
+        </RevelarGrupo>
 
         {/*
           Conectores hacia las vocalías. Como en la slide 03, la barra cuelga del
@@ -212,23 +217,26 @@ export default function ConsejoDirectivoPage() {
         </div>
 
         {/* Nivel 4 — Vocalías */}
-        <ul className="grid grid-cols-3">
+        <RevelarGrupo as="ul" className="grid grid-cols-3">
           {vocales.map((integrante) => (
             <li key={integrante.nombre} className="flex justify-center">
               <NodoOrganigrama integrante={integrante} />
             </li>
           ))}
-        </ul>
+        </RevelarGrupo>
       </div>
 
       {/* ——— Lista por nivel (<1024px): sin scroll horizontal ——— */}
-      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:hidden">
+      <RevelarGrupo
+        as="ul"
+        className="mt-10 grid gap-4 sm:grid-cols-2 lg:hidden"
+      >
         {todos.map((integrante, indice) => (
           <li key={integrante.nombre}>
             <TarjetaIntegrante integrante={integrante} prioridad={indice === 0} />
           </li>
         ))}
-      </ul>
+      </RevelarGrupo>
     </Contenedor>
   );
 }

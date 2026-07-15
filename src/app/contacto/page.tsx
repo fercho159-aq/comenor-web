@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Contenedor, TarjetaSolida, Titulo } from "@/components/ui";
+import { Revelar, RevelarGrupo } from "@/components/anim";
 import FormularioContacto from "./FormularioContacto";
 
 export const metadata: Metadata = {
@@ -63,7 +64,7 @@ export default function ContactoPage() {
           Contacto
         </Titulo>
 
-        <div className="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-2 lg:gap-8">
+        <RevelarGrupo className="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-2 lg:gap-8">
           <TarjetaSolida
             variante="verde-700"
             titulo="Mail"
@@ -93,20 +94,24 @@ export default function ContactoPage() {
               </a>
             }
           />
-        </div>
+        </RevelarGrupo>
       </Contenedor>
 
       {/* ——— Formulario de contacto (validación doble cliente/servidor) ——— */}
       <Contenedor as="section" ancho="estrecho" className="pb-20 lg:pb-28">
-        <Titulo as="h2" tamano="titulo">
-          Envíanos un mensaje
-        </Titulo>
-        <p className="text-cuerpo mt-4 text-tinta text-pretty">
-          Completa el formulario y el equipo de COMENOR te responderá al correo
-          que nos indiques.
-        </p>
+        <Revelar>
+          <Titulo as="h2" tamano="titulo">
+            Envíanos un mensaje
+          </Titulo>
+          <p className="text-cuerpo mt-4 text-tinta text-pretty">
+            Completa el formulario y el equipo de COMENOR te responderá al correo
+            que nos indiques.
+          </p>
+        </Revelar>
 
-        <FormularioContacto />
+        <Revelar delay={0.1}>
+          <FormularioContacto />
+        </Revelar>
       </Contenedor>
     </>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Revelar, RevelarGrupo } from "@/components/anim";
 import { Contenedor, Eyebrow, Foto, Pill, TarjetaSolida, Titulo } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -187,20 +188,30 @@ export default function EjesPage() {
           className="scroll-mt-24 py-14 lg:scroll-mt-40 lg:py-20"
         >
           <Contenedor>
-            <Eyebrow>Eje temático {eje.numero}</Eyebrow>
-            <Titulo as="h2" className="mt-3 uppercase">
-              {eje.titulo}
-            </Titulo>
+            <Revelar>
+              <Eyebrow>Eje temático {eje.numero}</Eyebrow>
+              <Titulo as="h2" className="mt-3 uppercase">
+                {eje.titulo}
+              </Titulo>
+            </Revelar>
 
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+            <Revelar
+              as="div"
+              className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8"
+            >
               <Pill tamano="lg" className="self-start sm:self-auto">
                 Objetivo
               </Pill>
               <p className="text-titulo max-w-3xl text-pretty text-tinta">{eje.objetivo}</p>
-            </div>
+            </Revelar>
 
-            <h3 className="text-titulo mt-14 text-center text-verde">Líneas de acción</h3>
-            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Revelar as="h3" className="text-titulo mt-14 text-center text-verde">
+              Líneas de acción
+            </Revelar>
+            <RevelarGrupo
+              as="ul"
+              className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            >
               {eje.lineasDeAccion.map((linea, indice) => (
                 <li key={linea}>
                   <TarjetaSolida
@@ -210,7 +221,7 @@ export default function EjesPage() {
                   />
                 </li>
               ))}
-            </ul>
+            </RevelarGrupo>
           </Contenedor>
         </section>
       ))}
@@ -222,12 +233,14 @@ export default function EjesPage() {
         className="tema-oscuro scroll-mt-24 bg-verde py-16 lg:scroll-mt-40 lg:py-24"
       >
         <Contenedor>
-          <Eyebrow variante="sobre-oscuro">Visión 2026</Eyebrow>
-          <Titulo as="h2" variante="sobre-oscuro" className="mt-3">
-            Prioridades para COMENOR
-          </Titulo>
+          <Revelar>
+            <Eyebrow variante="sobre-oscuro">Visión 2026</Eyebrow>
+            <Titulo as="h2" variante="sobre-oscuro" className="mt-3">
+              Prioridades para COMENOR
+            </Titulo>
+          </Revelar>
 
-          <ol className="mt-12 flex flex-col">
+          <RevelarGrupo as="ol" className="mt-12 flex flex-col">
             {PRIORIDADES.map((prioridad, indice) => (
               <li
                 key={prioridad.numero}
@@ -255,11 +268,14 @@ export default function EjesPage() {
                 </div>
               </li>
             ))}
-          </ol>
+          </RevelarGrupo>
 
-          <p className="text-titulo mt-14 text-balance font-bold italic text-blanco">
+          <Revelar
+            as="p"
+            className="text-titulo mt-14 text-balance font-bold italic text-blanco"
+          >
             Que COMENOR esté en la mesa donde se decide — no en la sala de espera.
-          </p>
+          </Revelar>
         </Contenedor>
       </section>
     </>
