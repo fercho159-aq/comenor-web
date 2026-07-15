@@ -2,7 +2,20 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  BadgeCheck,
+  Building2,
+  CircuitBoard,
+  Factory,
+  Flame,
+  Handshake,
+  Landmark,
+  ShieldCheck,
+  Shirt,
+  type LucideIcon,
+} from "lucide-react";
+import {
   Boton,
+  ChipIcono,
   Contenedor,
   Eyebrow,
   Foto,
@@ -30,13 +43,44 @@ export const metadata: Metadata = {
  * (claro/oscuro/claro · oscuro/claro/oscuro). La tarjeta clara es verde-700.
  */
 const ORGANISMOS = [
-  { nombre: "ONNCCE", sector: "Construcción y obra civil" },
-  { nombre: "INNTEX", sector: "Textiles y equipo de protección personal" },
-  { nombre: "NYCE", sector: "Electrónica / TIC / Química" },
-  { nombre: "IMNC (IMEEC)", sector: "Multisector ISO / Sistemas de gestión" },
-  { nombre: "ULSE", sector: "Seguridad contra incendios" },
-  { nombre: "CANACERO", sector: "Siderurgia y acero" },
-] as const satisfies ReadonlyArray<{ nombre: string; sector: string }>;
+  { nombre: "ONNCCE", sector: "Construcción y obra civil", icono: Building2 },
+  {
+    nombre: "INNTEX",
+    sector: "Textiles y equipo de protección personal",
+    icono: Shirt,
+  },
+  { nombre: "NYCE", sector: "Electrónica / TIC / Química", icono: CircuitBoard },
+  {
+    nombre: "IMNC (IMEEC)",
+    sector: "Multisector ISO / Sistemas de gestión",
+    icono: BadgeCheck,
+  },
+  { nombre: "ULSE", sector: "Seguridad contra incendios", icono: Flame },
+  { nombre: "CANACERO", sector: "Siderurgia y acero", icono: Factory },
+] as const satisfies ReadonlyArray<{
+  nombre: string;
+  sector: string;
+  icono: LucideIcon;
+}>;
+
+/** Qué hace COMENOR — las filas densas de la slide 05, ya escaneables. */
+const QUE_HACEMOS = [
+  {
+    icono: Landmark,
+    texto:
+      "Organismo paraguas que articula el ecosistema nacional de la Infraestructura de la Calidad desde 1996.",
+  },
+  {
+    icono: Handshake,
+    texto:
+      "Interlocutor técnico e institucional ante el gobierno, el sector productivo y los foros internacionales.",
+  },
+  {
+    icono: ShieldCheck,
+    texto:
+      "Impulsa la cultura de la calidad, la confianza y la competitividad a través de la normalización y la evaluación de la conformidad.",
+  },
+] as const satisfies ReadonlyArray<{ icono: LucideIcon; texto: string }>;
 
 /** Slide 04 — las cuatro categorías de asociados y miembros. */
 const CATEGORIAS_ASOCIADOS = [
@@ -232,19 +276,17 @@ export default function PaginaInicio() {
                 <strong>Infraestructura de la Calidad</strong> más eficiente,
                 incluyente, accesible y competitiva para México.
               </p>
-              <p className="text-cuerpo text-tinta mt-4 text-pretty">
-                Somos el organismo paraguas que representa y articula el
-                ecosistema nacional de Infraestructura de la Calidad en México{" "}
-                <strong>desde 1996</strong>. COMENOR actúa como interlocutor
-                técnico e institucional ante el gobierno, el sector productivo y
-                los foros internacionales.
-              </p>
-              <p className="text-cuerpo text-tinta mt-4 text-pretty">
-                Nuestro compromiso es promover la cultura de la calidad, la
-                confianza y la competitividad, contribuyendo al desarrollo
-                económico, la innovación y el fortalecimiento de los mercados a
-                través de la normalización y la evaluación de la conformidad.
-              </p>
+
+              <ul className="mt-8 flex flex-col gap-5">
+                {QUE_HACEMOS.map((fila) => (
+                  <li key={fila.texto} className="flex items-start gap-4">
+                    <ChipIcono icon={fila.icono} />
+                    <p className="text-cuerpo text-tinta text-pretty">
+                      {fila.texto}
+                    </p>
+                  </li>
+                ))}
+              </ul>
 
               <div className="mt-8">
                 <Boton href="/nosotros" variante="secundario">
@@ -281,15 +323,19 @@ export default function PaginaInicio() {
             as="ul"
             className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3"
           >
-            {ORGANISMOS.map((organismo, indice) => (
-              <li key={organismo.nombre}>
-                <TarjetaSolida
-                  titulo={organismo.nombre}
-                  descripcion={organismo.sector}
-                  variante={indice % 2 === 0 ? "verde-700" : "verde-900"}
-                />
-              </li>
-            ))}
+            {ORGANISMOS.map((organismo, indice) => {
+              const IconoSector = organismo.icono;
+              return (
+                <li key={organismo.nombre}>
+                  <TarjetaSolida
+                    titulo={organismo.nombre}
+                    descripcion={organismo.sector}
+                    variante={indice % 2 === 0 ? "verde-700" : "verde-900"}
+                    glifo={<IconoSector className="size-8" strokeWidth={1.5} />}
+                  />
+                </li>
+              );
+            })}
           </RevelarGrupo>
         </Contenedor>
       </Revelar>

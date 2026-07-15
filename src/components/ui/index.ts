@@ -1,4 +1,5 @@
 export { default as Boton } from "./Boton";
+export { default as ChipIcono } from "./ChipIcono";
 export { default as Contenedor } from "./Contenedor";
 export { default as Eyebrow } from "./Eyebrow";
 export { default as Foto } from "./Foto";

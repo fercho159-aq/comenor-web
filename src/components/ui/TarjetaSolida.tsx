@@ -14,6 +14,11 @@ type TarjetaSolidaProps = {
   variante?: "verde" | "verde-700" | "verde-900" | "vino";
   /** Medallón opcional sobre el título (slide 15: sobre blanco, icono en verde). */
   icono?: ReactNode;
+  /**
+   * Glifo ligero sobre el título (sin medallón): un ícono en salvia que hereda
+   * `currentColor`. Para rejillas donde el medallón sería demasiado pesado.
+   */
+  glifo?: ReactNode;
   /** `centro` como en las slides; `izquierda` para listas densas. */
   alineacion?: "centro" | "izquierda";
   className?: string;
@@ -40,6 +45,7 @@ export default function TarjetaSolida({
   descripcion,
   variante = "verde",
   icono,
+  glifo,
   alineacion = "centro",
   className,
   children,
@@ -58,6 +64,7 @@ export default function TarjetaSolida({
           {icono}
         </span>
       ) : null}
+      {glifo ? <span className="text-salvia">{glifo}</span> : null}
       <h3 className="text-lg font-bold text-blanco sm:text-xl">{titulo}</h3>
       {descripcion ? (
         <p className="text-cuerpo text-salvia text-pretty">{descripcion}</p>
