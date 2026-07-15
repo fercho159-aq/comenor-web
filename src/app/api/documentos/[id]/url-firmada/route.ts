@@ -1,7 +1,7 @@
 /**
  * GET /api/documentos/[id]/url-firmada
  *
- * Devuelve una URL FIRMADA de Supabase Storage de vida corta (60 s) para que
+ * Devuelve una URL FIRMADA de MinIO/S3 de vida corta (60 s) para que
  * el visor renderice el documento, SIEMPRE que el rol del solicitante tenga
  * acceso al nivel del documento. Barrera contra IDOR: un asociado que pide un
  * documento de nivel `consejo` recibe 403 y NUNCA se firma la URL.

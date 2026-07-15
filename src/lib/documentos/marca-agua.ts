@@ -66,7 +66,7 @@ function estamparPagina(
  * Devuelve una copia del PDF con la marca de agua estampada en TODAS las
  * páginas. No muta el buffer de entrada.
  *
- * @param pdfOriginal Bytes del PDF original (de Supabase Storage).
+ * @param pdfOriginal Bytes del PDF original (de MinIO/S3).
  * @param datos       Correo del usuario + fecha de apertura.
  * @returns Bytes del PDF con marca de agua.
  * @throws Si el PDF no se puede cargar (bytes corruptos / no es PDF).

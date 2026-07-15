@@ -1,12 +1,13 @@
 /**
  * Helpers de sesión y RBAC para Server Components, Server Actions y
- * Route Handlers. El rol vive en profiles.tipo (src/db/schema.ts) y el
- * rol admin exige además estar en ADMIN_ALLOWED_EMAILS (allowlist).
+ * Route Handlers, sobre better-auth (Neon Postgres). El rol vive en la
+ * columna user.rol (src/db/schema.ts) y el rol admin exige además estar
+ * en ADMIN_ALLOWED_EMAILS (allowlist).
  *
- * En middleware usa src/lib/auth/permisos.ts directamente (este archivo
- * depende de next/headers vía el cliente de servidor).
+ * En el proxy usa src/lib/auth/permisos.ts + auth.api.getSession directamente
+ * (este archivo depende de next/headers).
  */
-import type { User } from "@supabase/supabase-js";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
@@ -16,15 +17,31 @@ import {
   tienePermiso,
   type Rol,
 } from "@/lib/auth/permisos";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth/config";
 
 export type { Rol };
 export { esRol, parseAdminAllowlist, rolEfectivo, tienePermiso };
 
+/**
+ * Usuario de la sesión (forma estable propia — NO el tipo interno de
+ * better-auth). `user_metadata` se conserva por compatibilidad con los
+ * consumidores que derivaban el nombre a mostrar (antes Supabase).
+ */
+export interface UsuarioSesion {
+  id: string;
+  email: string;
+  /** Metadatos ligeros para UI (nombre a mostrar). */
+  user_metadata: { nombre?: string; name?: string };
+}
+
 /** Usuario autenticado + su rol efectivo. */
 export interface UsuarioConRol {
-  user: User;
+  user: UsuarioSesion;
   rol: Rol;
+  /** Acceso directo (= user.id). */
+  id: string;
+  /** Acceso directo (= user.email). */
+  email: string;
 }
 
 /** Opciones de requireRol. */
@@ -49,39 +66,57 @@ export class ErrorAutorizacion extends Error {
 }
 
 /**
- * Usuario autenticado de la petición actual, o null si no hay sesión.
- * Usa auth.getUser() (valida el JWT contra Supabase), nunca getSession().
+ * Sesión cruda de better-auth para la petición actual (valida el token de
+ * sesión contra la BD), o null si no hay sesión o el servicio falla.
+ * Falla CERRADA: cualquier error ⇒ null (nunca una sesión inventada).
  */
-export async function getSesion(): Promise<User | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
+async function sesionActual(): Promise<{
+  user: { id: string; email: string; name: string; rol?: unknown };
+} | null> {
+  try {
+    const sesion = await auth.api.getSession({ headers: await headers() });
+    if (!sesion?.user) return null;
+    return sesion;
+  } catch {
+    return null;
+  }
+}
+
+/** Convierte el user de better-auth a la forma estable UsuarioSesion. */
+function aUsuarioSesion(user: { id: string; email: string; name: string }): UsuarioSesion {
+  return {
+    id: user.id,
+    email: user.email,
+    user_metadata: { name: user.name, nombre: user.name },
+  };
 }
 
 /**
- * Usuario + rol efectivo leyendo profiles.tipo.
- * Devuelve null si: no hay sesión, no hay fila en profiles, el tipo no es
- * válido, o el tipo es 'admin' pero el correo no está en ADMIN_ALLOWED_EMAILS.
+ * Usuario autenticado de la petición actual, o null si no hay sesión.
+ * La sesión se valida server-side contra la BD (better-auth), nunca se
+ * confía en el contenido de la cookie sin verificar.
+ */
+export async function getSesion(): Promise<UsuarioSesion | null> {
+  const sesion = await sesionActual();
+  if (!sesion) return null;
+  return aUsuarioSesion(sesion.user);
+}
+
+/**
+ * Usuario + rol efectivo leyendo user.rol.
+ * Devuelve null si: no hay sesión, el rol no es válido, o el rol es 'admin'
+ * pero el correo no está en ADMIN_ALLOWED_EMAILS (falla cerrada).
  */
 export async function getUsuarioConRol(): Promise<UsuarioConRol | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  const user = data.user;
-
-  const { data: perfil, error: errorPerfil } = await supabase
-    .from("profiles")
-    .select("tipo")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (errorPerfil || !perfil) return null;
+  const sesion = await sesionActual();
+  if (!sesion) return null;
 
   const allowlist = parseAdminAllowlist(process.env.ADMIN_ALLOWED_EMAILS);
-  const rol = rolEfectivo(perfil.tipo, user.email, allowlist);
+  const rol = rolEfectivo(sesion.user.rol, sesion.user.email, allowlist);
   if (!rol) return null;
 
-  return { user, rol };
+  const user = aUsuarioSesion(sesion.user);
+  return { user, rol, id: user.id, email: user.email };
 }
 
 /**

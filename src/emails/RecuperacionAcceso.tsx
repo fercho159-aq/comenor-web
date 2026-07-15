@@ -12,7 +12,7 @@ export type RecuperacionAccesoProps = {
 
 /**
  * Correo de recuperación de acceso (restablecer contraseña) del micrositio.
- * El enlace lo genera Supabase Auth / el backend; aquí solo se presenta. La
+ * El enlace lo genera better-auth / el backend; aquí solo se presenta. La
  * vigencia se comunica explícitamente para que el usuario no lo posponga.
  */
 export default function RecuperacionAcceso({

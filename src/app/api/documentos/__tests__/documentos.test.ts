@@ -1,10 +1,9 @@
 // @vitest-environment node
 // Los route handlers usan Request/FormData/File (undici). jsdom no implementa
 // bien FormData con File (cuelga request.formData()); node es el entorno real.
-import type { User } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Rol, UsuarioConRol } from "@/lib/auth/roles";
+import type { Rol, UsuarioConRol, UsuarioSesion } from "@/lib/auth/roles";
 
 /**
  * Estado mutable compartido con el mock de `@/db`. Cada test lo configura para
@@ -58,8 +57,9 @@ vi.mock("@/lib/auth/roles", () => {
 });
 
 // --- Mock de servicios externos --------------------------------------------
-vi.mock("@/lib/supabase/admin", () => ({
-  createAdminClient: vi.fn(),
+vi.mock("@/lib/storage/objetos", () => ({
+  subirObjeto: vi.fn().mockResolvedValue(undefined),
+  eliminarObjetos: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock("@/lib/storage/firmadas", () => ({
   urlFirmada: vi.fn(),
@@ -72,7 +72,7 @@ import {
   requireRol,
 } from "@/lib/auth/roles";
 import { urlFirmada } from "@/lib/storage/firmadas";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { subirObjeto } from "@/lib/storage/objetos";
 import { POST as crearDocumento } from "@/app/api/documentos/route";
 import { GET as obtenerUrlFirmada } from "@/app/api/documentos/[id]/url-firmada/route";
 import { POST as crearVersion } from "@/app/api/documentos/[id]/versiones/route";
@@ -80,11 +80,12 @@ import { POST as crearVersion } from "@/app/api/documentos/[id]/versiones/route"
 const mockRequireRol = vi.mocked(requireRol);
 const mockGetUsuario = vi.mocked(getUsuarioConRol);
 const mockUrlFirmada = vi.mocked(urlFirmada);
-const mockCrearAdmin = vi.mocked(createAdminClient);
+const mockSubirObjeto = vi.mocked(subirObjeto);
 
-/** Construye un UsuarioConRol de prueba (User mínimo, casteado). */
+/** Construye un UsuarioConRol de prueba (UsuarioSesion mínimo). */
 function usuarioDe(rol: Rol, id = "u", email = `${rol}@comenor.org.mx`): UsuarioConRol {
-  return { user: { id, email } as unknown as User, rol };
+  const user: UsuarioSesion = { id, email, user_metadata: {} };
+  return { user, rol, id, email };
 }
 
 const usuarioAdmin = usuarioDe("admin", "admin-uuid");
@@ -135,8 +136,8 @@ describe("POST /api/documentos", () => {
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.errores.titulo).toBeDefined();
-    // Nunca llegó a subir a Storage.
-    expect(mockCrearAdmin).not.toHaveBeenCalled();
+    // Nunca llegó a subir al almacenamiento.
+    expect(mockSubirObjeto).not.toHaveBeenCalled();
   });
 
   it("sin archivo → 400 con error en 'archivo'", async () => {
@@ -158,7 +159,7 @@ describe("POST /api/documentos", () => {
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.errores.archivo).toBeDefined();
-    expect(mockCrearAdmin).not.toHaveBeenCalled();
+    expect(mockSubirObjeto).not.toHaveBeenCalled();
   });
 
   it("sin rol admin → 401/403 (ErrorAutorizacion propagado)", async () => {

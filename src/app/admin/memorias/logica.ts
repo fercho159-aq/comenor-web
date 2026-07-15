@@ -3,7 +3,7 @@
  * Sin dependencias de Next/DB/sharp: reglas testeables con vitest.
  */
 
-/** Bucket privado de Supabase Storage para las fotos de memorias. */
+/** Bucket lógico PRIVADO (prefijo en MinIO) para las fotos de memorias. */
 export const BUCKET_MEMORIAS = "memorias";
 
 /** Tipos MIME de imagen aceptados al subir fotos. */

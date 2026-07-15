@@ -6,10 +6,10 @@
  * No existe un route handler en `src/app/api/*` para galerías/fotos, así que la
  * mutación vive aquí, colocada con su UI (patrón idiomático de Next 16 para el
  * panel admin) y detrás de `requireRol(["admin"])`. Reutiliza los wrappers
- * compartidos: `@/db` (drizzle), `@/lib/supabase/admin` (Storage service-role) y
+ * compartidos: `@/db` (drizzle), `@/lib/storage` (MinIO/S3, solo servidor) y
  * `@/lib/auth/roles`. La compresión de imágenes usa `sharp` al subir.
  *
- * SOLO SERVIDOR. La service-role key nunca llega al cliente.
+ * SOLO SERVIDOR. Las credenciales S3 nunca llegan al cliente.
  */
 import { randomUUID } from "node:crypto";
 
@@ -20,7 +20,7 @@ import sharp from "sharp";
 import { db } from "@/db";
 import { auditLog, galleries, galleryPhotos } from "@/db/schema";
 import { ErrorAutorizacion, requireRol } from "@/lib/auth/roles";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { eliminarObjetos, subirObjeto } from "@/lib/storage/objetos";
 
 import {
   ANCHO_MAX_FOTO,
@@ -190,10 +190,10 @@ export async function eliminarGaleria(
     .where(eq(galleryPhotos.galleryId, galeriaId));
 
   if (fotos.length > 0) {
-    const supabase = createAdminClient();
-    await supabase.storage
-      .from(BUCKET_MEMORIAS)
-      .remove(fotos.map((f) => f.storagePath));
+    await eliminarObjetos(
+      BUCKET_MEMORIAS,
+      fotos.map((f) => f.storagePath),
+    );
   }
 
   // gallery_photos cae por ON DELETE CASCADE del esquema.
@@ -261,7 +261,6 @@ export async function subirFotos(
     .orderBy(asc(galleryPhotos.orden));
   let orden = siguienteOrden(existentes.map((f) => f.orden));
 
-  const supabase = createAdminClient();
   let primeraRuta: string | null = null;
   let subidas = 0;
 
@@ -284,13 +283,11 @@ export async function subirFotos(
       };
     }
 
-    const { error } = await supabase.storage
-      .from(BUCKET_MEMORIAS)
-      .upload(ruta, comprimida, {
+    try {
+      await subirObjeto(BUCKET_MEMORIAS, ruta, comprimida, {
         contentType: "image/jpeg",
-        upsert: false,
       });
-    if (error) {
+    } catch {
       return {
         ok: false,
         mensaje: `Fallo al subir "${archivo.name}" al almacenamiento.`,
@@ -382,8 +379,7 @@ export async function eliminarFoto(fotoId: string): Promise<ResultadoAccion> {
     return { ok: false, mensaje: "La foto no existe." };
   }
 
-  const supabase = createAdminClient();
-  await supabase.storage.from(BUCKET_MEMORIAS).remove([foto.storagePath]);
+  await eliminarObjetos(BUCKET_MEMORIAS, [foto.storagePath]);
   await db.delete(galleryPhotos).where(eq(galleryPhotos.id, fotoId));
 
   // Si esa foto era la portada, reasignar a la primera restante (o null).

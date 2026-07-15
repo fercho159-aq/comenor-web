@@ -2,8 +2,9 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { APIError } from "better-auth";
 import { loginSchema } from "@/lib/schemas";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth/config";
 import { ipConfiable } from "@/lib/net/ip";
 import { CAMPO_HONEYPOT, esHoneypotDisparado, limitar } from "@/lib/ratelimit";
 
@@ -32,7 +33,9 @@ function destinoSeguro(valor: FormDataEntryValue | null): string {
 }
 
 /**
- * Inicia sesión con correo/contraseña vía Supabase Auth.
+ * Inicia sesión con correo/contraseña vía better-auth (signInEmail).
+ * El plugin nextCookies() de src/lib/auth/config.ts escribe la cookie de
+ * sesión desde esta server action.
  *
  * Validación doble (PLAN.md §2.1): el cliente ya validó con `loginSchema`; aquí
  * se RE-VALIDA con el mismo esquema antes de tocar el servicio. Campo inválido =
@@ -44,7 +47,7 @@ export async function iniciarSesion(
   formData: FormData,
 ): Promise<EstadoLogin> {
   // Honeypot: campo oculto que solo un bot rellena. Mensaje genérico, sin
-  // revelar la trampa ni tocar Supabase.
+  // revelar la trampa ni tocar el servicio de auth.
   if (esHoneypotDisparado(formData.get(CAMPO_HONEYPOT))) {
     return { ok: false, mensaje: "Correo o contraseña incorrectos." };
   }
@@ -77,15 +80,25 @@ export async function iniciarSesion(
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: resultado.data.correo,
-    password: resultado.data.password,
-  });
-
-  if (error) {
-    // Mensaje genérico: no distinguir "no existe" de "contraseña incorrecta".
-    return { ok: false, mensaje: "Correo o contraseña incorrectos." };
+  try {
+    await auth.api.signInEmail({
+      body: {
+        email: resultado.data.correo,
+        password: resultado.data.password,
+      },
+      headers: await headers(),
+    });
+  } catch (error) {
+    if (error instanceof APIError) {
+      // Mensaje genérico: no distinguir "no existe" de "contraseña incorrecta".
+      return { ok: false, mensaje: "Correo o contraseña incorrectos." };
+    }
+    // Falla de servicio (BD caída, mala configuración): también genérico,
+    // sin filtrar detalles internos al cliente.
+    return {
+      ok: false,
+      mensaje: "No se pudo iniciar sesión. Intenta de nuevo en un momento.",
+    };
   }
 
   // `redirect` lanza internamente: debe ir fuera de cualquier try/catch y al

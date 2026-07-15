@@ -1,0 +1,100 @@
+# =============================================================================
+# COMENOR — Caddy reverse proxy (VPS MAW Soluciones)
+#
+# TLS automático (Let's Encrypt) para dos subdominios:
+#   - {$STORAGE_DOMAIN}  → MinIO S3 API  (público: la app firma URLs de vida corta)
+#   - {$DOCS_DOMAIN}     → Gotenberg     (protegido por Bearer token; 401 sin él)
+#
+# La consola de administración de MinIO (puerto 9001) NO se publica aquí:
+# se alcanza por túnel SSH (ver docs/RUNBOOK.md). Nada más queda expuesto.
+#
+# Las variables {$VAR} se sustituyen al cargar, desde el entorno del contenedor
+# Caddy (inyectadas por docker-compose desde .env.vps).
+# =============================================================================
+
+{
+	# Cuenta ACME: correo para avisos de expiración de certificados.
+	email {$ACME_EMAIL}
+
+	# Endurecimiento del propio servidor.
+	servers {
+		protocols h1 h2
+	}
+}
+
+# --- Cabeceras de seguridad comunes a todos los sitios --------------------
+(seguridad) {
+	header {
+		# HSTS: fuerza HTTPS por 2 años, incluyendo subdominios.
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		# Anti-clickjacking y anti-sniffing.
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		# No revelar el motor del proxy.
+		-Server
+	}
+}
+
+# =============================================================================
+# MinIO S3 API — almacenamiento de objetos (privado; se accede con URL firmada)
+# =============================================================================
+{$STORAGE_DOMAIN} {
+	import seguridad
+
+	# El SDK de S3 usa path-style (forcePathStyle:true): la clave viaja en la
+	# ruta, no en un subdominio por bucket. Solo hay que preservar Host y stream.
+	reverse_proxy minio:9000 {
+		# MinIO valida la firma AWS SigV4 sobre el Host original.
+		header_up Host {host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	# Subidas de documentos grandes: sin límite artificial de cuerpo.
+	request_body {
+		max_size 512MB
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
+
+# =============================================================================
+# Gotenberg — conversión Word/Excel → PDF (protegido por token)
+#
+# Gotenberg no tiene autenticación propia. Aquí exigimos la MISMA cabecera que
+# manda la app (`Authorization: Bearer <GOTENBERG_TOKEN>`, ver
+# src/lib/documentos/gotenberg.ts). Sin ella → 401. Con ella → se proxya.
+# =============================================================================
+{$DOCS_DOMAIN} {
+	import seguridad
+
+	@autorizado header Authorization "Bearer {$GOTENBERG_TOKEN}"
+
+	handle @autorizado {
+		reverse_proxy gotenberg:3000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Cualquier petición sin el token correcto se rechaza sin tocar Gotenberg.
+	handle {
+		respond "401 No autorizado" 401 {
+			close
+		}
+	}
+
+	# Conversiones de LibreOffice pueden tardar; sin límite bajo de cuerpo.
+	request_body {
+		max_size 128MB
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

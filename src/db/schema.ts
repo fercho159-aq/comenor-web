@@ -19,7 +19,7 @@ import {
 // Enums de Postgres
 // ---------------------------------------------------------------------------
 
-/** Tipo de perfil de usuario. */
+/** Tipo de perfil / rol de usuario (columna user.rol). */
 export const tipoPerfilEnum = pgEnum("tipo_perfil", [
   "consejo",
   "asociados",
@@ -61,17 +61,108 @@ export const estadoPagoEnum = pgEnum("estado_pago", [
 // Tablas
 // ---------------------------------------------------------------------------
 
-/** Perfiles de usuario (espeja auth de Supabase; id = auth.users.id). */
-export const profiles = pgTable("profiles", {
-  id: uuid("id").primaryKey(),
-  tipo: tipoPerfilEnum("tipo").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+// ---------------------------------------------------------------------------
+// Tablas de autenticación (better-auth + adaptador Drizzle).
+// El esquema sigue el contrato de better-auth (user/session/account/verification)
+// con ids uuid generados por la BD (advanced.database.generateId = false en
+// src/lib/auth/config.ts). El ROL vive en user.rol (reemplaza a la extinta
+// tabla profiles).
+// ---------------------------------------------------------------------------
+
+/** Usuarios (better-auth). El rol de la app vive aquí, en `rol`. */
+export const user = pgTable(
+  "user",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    emailVerified: boolean("email_verified").notNull().default(false),
+    image: text("image"),
+    /** Rol de la app: consejo | asociados | admin (allowlist aparte). */
+    rol: tipoPerfilEnum("rol").notNull().default("asociados"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [uniqueIndex("user_email_idx").on(table.email)],
+);
+
+/** Sesiones (better-auth). */
+export const session = pgTable(
+  "session",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    token: text("token").notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("session_token_idx").on(table.token),
+    index("session_user_id_idx").on(table.userId),
+  ],
+);
+
+/** Cuentas/credenciales (better-auth; email+password vive aquí). */
+export const account = pgTable(
+  "account",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+    }),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("account_user_id_idx").on(table.userId)],
+);
+
+/** Tokens de verificación (better-auth). */
+export const verification = pgTable(
+  "verification",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
 
 /** Documentos normativos / actas / memorias. */
 export const documents = pgTable("documents", {
@@ -85,7 +176,7 @@ export const documents = pgTable("documents", {
   formato: text("formato").notNull(),
   creadoPor: uuid("creado_por")
     .notNull()
-    .references(() => profiles.id),
+    .references(() => user.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -101,7 +192,7 @@ export const documentVersions = pgTable("document_versions", {
   version: integer("version").notNull(),
   editadoPor: uuid("editado_por")
     .notNull()
-    .references(() => profiles.id),
+    .references(() => user.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -235,7 +326,7 @@ export const auditLog = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     actor: uuid("actor")
       .notNull()
-      .references(() => profiles.id),
+      .references(() => user.id),
     accion: text("accion").notNull(),
     entidad: text("entidad").notNull(),
     entidadId: text("entidad_id").notNull(),
@@ -263,8 +354,14 @@ export const emailRecipients = pgTable(
 // Tipos inferidos (select / insert) para consumo en backend y admin
 // ---------------------------------------------------------------------------
 
-export type Profile = typeof profiles.$inferSelect;
-export type NewProfile = typeof profiles.$inferInsert;
+export type Usuario = typeof user.$inferSelect;
+export type NewUsuario = typeof user.$inferInsert;
+export type Sesion = typeof session.$inferSelect;
+export type NewSesion = typeof session.$inferInsert;
+export type Cuenta = typeof account.$inferSelect;
+export type NewCuenta = typeof account.$inferInsert;
+export type Verificacion = typeof verification.$inferSelect;
+export type NewVerificacion = typeof verification.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type DocumentVersion = typeof documentVersions.$inferSelect;

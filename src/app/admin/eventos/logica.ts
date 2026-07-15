@@ -1,7 +1,7 @@
 /**
  * Lógica de negocio PURA del panel de administración de eventos.
  *
- * Sin dependencias de Next, Supabase ni la base de datos: todo lo testeable en
+ * Sin dependencias de Next, el storage ni la base de datos: todo lo testeable en
  * aislamiento (conversión de montos, slug, validación con `eventoSchema`,
  * derivación de rutas de imagen) vive aquí para poder probarse con vitest sin
  * servicios vivos. Las acciones de servidor (acciones.ts) orquestan esto con
@@ -10,7 +10,7 @@
 import { eventoSchema, type EventoInput } from "@/lib/schemas";
 
 /**
- * Bucket PÚBLICO de imágenes de eventos en Supabase Storage.
+ * Bucket lógico PÚBLICO de imágenes de eventos (prefijo en MinIO).
  *
  * A diferencia del bucket de documentos (privado, URLs firmadas), la portada de
  * un evento se muestra en el calendario público, así que su URL es pública. El

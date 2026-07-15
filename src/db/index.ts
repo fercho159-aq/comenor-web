@@ -33,7 +33,7 @@ function obtenerDb(): DrizzleDb {
     globalThis.__comenorDbClient ??
     postgres(connectionString, {
       max: 1,
-      // Supabase pooler (transaction mode) no soporta prepared statements.
+      // El pooler de Neon (transaction mode) no soporta prepared statements.
       prepare: false,
     });
 

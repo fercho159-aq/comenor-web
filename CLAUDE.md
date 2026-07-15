@@ -51,12 +51,16 @@ pills `rounded-full` en `verde-900` · logo wordmark entre dos swooshes (`verde`
 
 - **Validación doble siempre:** esquema Zod compartido cliente/servidor; el route handler **re-valida**.
   Campo vacío = `400` con mensaje por campo. La BD además tiene `NOT NULL`.
-- **RLS activado en todas las tablas** de Supabase. El anon key jamás alcanza datos privados.
+- **Control de acceso en el código** (no RLS): `@/lib/auth` (`requireRol`, `rolEfectivo`,
+  `tienePermiso`) + el middleware de roles en `src/proxy.ts` protegen `/admin` y `/miembros`.
+  Los route handlers y server actions re-validan el rol; falla cerrada ante error de BD/servicio.
+  Las credenciales S3 (`S3_*`) y de Gotenberg jamás llegan al cliente (módulos server-only).
 - **Webhooks Mercado Pago:** validar firma `x-signature`, idempotencia por `mp_payment_id`, responder 200 rápido.
   Nunca confiar en el monto que manda el cliente — verificar contra la API de MP.
 - **QR firmado:** `HMAC(registration_id + event_id, QR_SIGNING_SECRET)`. En BD solo el hash. Uso único.
 - Rate limiting + honeypot en formularios públicos y login. Headers: CSP, HSTS, X-Frame-Options.
-- URLs de Storage **firmadas y de vida corta (60 s)** para el visor; nunca URLs públicas de documentos.
+- Storage en **MinIO (S3)** en el VPS MAW: URLs **firmadas y de vida corta (60 s)** para el visor
+  (`@/lib/storage/firmadas.ts`); nunca URLs públicas de documentos ni memorias.
 - **Cero secretos en código.** `.env.example` versionado; los valores reales solo en los dashboards.
 
 ## 4. Calidad de código

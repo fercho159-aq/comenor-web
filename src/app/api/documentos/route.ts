@@ -1,8 +1,8 @@
 /**
  * /api/documentos — alta y listado de documentos.
  *
- * POST  crea un documento: sube el archivo a un bucket PRIVADO de Supabase
- *       Storage y guarda los metadatos en `documents` con su `nivel_acceso`.
+ * POST  crea un documento: sube el archivo a un bucket PRIVADO de MinIO
+ *       (S3) y guarda los metadatos en `documents` con su `nivel_acceso`.
  *       Solo `admin` (gestión documental del panel). Validación Zod DOBLE.
  * GET   lista los documentos VISIBLES para el rol de quien pide (RLS + filtro
  *       por nivel de acceso). Sin sesión con rol válido → 401/403.
@@ -22,7 +22,7 @@ import {
   metadatosDocumentoSchema,
 } from "@/lib/documentos/almacenamiento";
 import { documentoSchema } from "@/lib/schemas";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { eliminarObjetos, subirObjeto } from "@/lib/storage/objetos";
 
 /** Traduce ErrorAutorizacion a una respuesta JSON con su status HTTP. */
 function respuestaAutorizacion(error: unknown): NextResponse | null {
@@ -123,16 +123,13 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    // Subida al bucket PRIVADO (service role; nunca URL pública).
-    const supabase = createAdminClient();
+    // Subida al bucket PRIVADO en MinIO (credenciales solo servidor; nunca URL pública).
     const bytes = new Uint8Array(await archivo.arrayBuffer());
-    const { error: errorSubida } = await supabase.storage
-      .from(BUCKET_DOCUMENTOS)
-      .upload(storagePath, bytes, {
+    try {
+      await subirObjeto(BUCKET_DOCUMENTOS, storagePath, bytes, {
         contentType: archivo.type || "application/octet-stream",
-        upsert: false,
       });
-    if (errorSubida) {
+    } catch {
       return NextResponse.json(
         { mensaje: "No se pudo almacenar el archivo. Intenta de nuevo." },
         { status: 502 },
@@ -153,7 +150,12 @@ export async function POST(request: Request): Promise<Response> {
         creadoPor: user.id,
       });
     } catch (errorDb) {
-      await supabase.storage.from(BUCKET_DOCUMENTOS).remove([storagePath]);
+      // Limpieza best-effort del objeto huérfano; el error original manda.
+      try {
+        await eliminarObjetos(BUCKET_DOCUMENTOS, [storagePath]);
+      } catch {
+        // Si la limpieza falla, se propaga igualmente el error de BD.
+      }
       throw errorDb;
     }
 

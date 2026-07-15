@@ -1,16 +1,16 @@
 /**
- * Proxy de Next 16 (sucesor de middleware.ts — misma semántica).
- * 1) Refresca la sesión de Supabase en cada petición (cookies SSR).
- * 2) Protege /admin/* (solo rol admin) y el micrositio privado /miembros/*
- *    (consejo/asociados/admin según sub-ruta).
- * Las rutas públicas pasan intactas: solo se les refresca la cookie.
+ * Proxy de Next 16 (sucesor de middleware.ts — corre en runtime Node).
+ * Valida la sesión de better-auth SERVER-SIDE (contra la BD, nunca confiando
+ * en la cookie sin verificar) y protege /admin/* (solo rol admin) y el
+ * micrositio privado /miembros/* (consejo/asociados/admin según sub-ruta).
+ * Las rutas públicas pasan intactas.
  *
  * La verificación de rol aquí es la PRIMERA barrera (UX); la autorización
- * real de datos vive en requireRol() dentro de cada handler + RLS en la BD.
+ * real de datos vive en requireRol() dentro de cada handler.
  */
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { auth, authConfigurado } from "@/lib/auth/config";
 import {
   parseAdminAllowlist,
   rolEfectivo,
@@ -41,19 +41,6 @@ function reglaPara(pathname: string): { prefijo: string; roles: readonly Rol[] }
   return null;
 }
 
-/**
- * ¿Están configuradas las credenciales de Supabase? En un deploy sin las env
- * vars (p. ej. el primer despliegue en Vercel antes de tener proyecto Supabase),
- * `createServerClient` con cadenas vacías LANZA y tumbaría TODO el sitio —
- * incluidas las páginas públicas. Se comprueba antes de crear el cliente.
- */
-function supabaseConfigurado(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
-}
-
 /** Redirige al login conservando el destino pretendido. */
 function redirigirALogin(request: NextRequest): NextResponse {
   const urlLogin = request.nextUrl.clone();
@@ -69,90 +56,54 @@ function redirigirALogin(request: NextRequest): NextResponse {
 export default async function proxy(request: NextRequest): Promise<NextResponse> {
   const regla = reglaPara(request.nextUrl.pathname);
 
-  // Sin backend de auth (Supabase no configurado): el sitio público debe
-  // seguir sirviéndose; las rutas protegidas fallan CERRADO (al login), nunca
-  // abiertas ni con un 500 que rompa toda la app.
-  if (!supabaseConfigurado()) {
-    if (!regla) return NextResponse.next({ request });
+  // Ruta pública: pasa intacta. better-auth mantiene su cookie de sesión desde
+  // sus propios endpoints (/api/auth/*); aquí no hay nada que refrescar.
+  if (!regla) return NextResponse.next({ request });
+
+  // Sin backend de auth (faltan BETTER_AUTH_SECRET / DATABASE_URL): el sitio
+  // público debe seguir sirviéndose; las rutas protegidas fallan CERRADO
+  // (al login), nunca abiertas ni con un 500 que rompa toda la app.
+  if (!authConfigurado()) return redirigirALogin(request);
+
+  // Sesión validada server-side contra la BD. Cualquier error del servicio
+  // ⇒ tratar como sin sesión (falla cerrada).
+  let sesion: Awaited<ReturnType<typeof auth.api.getSession>> = null;
+  try {
+    sesion = await auth.api.getSession({ headers: request.headers });
+  } catch {
+    sesion = null;
+  }
+
+  if (!sesion?.user) {
+    // Sin sesión → login, conservando a dónde quería ir.
     return redirigirALogin(request);
   }
 
-  let respuesta = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          for (const { name, value } of cookiesToSet) {
-            request.cookies.set(name, value);
-          }
-          respuesta = NextResponse.next({ request });
-          for (const { name, value, options } of cookiesToSet) {
-            respuesta.cookies.set(name, value, options);
-          }
-        },
-      },
-    },
-  );
-
-  // IMPORTANTE: getUser() refresca el token si expiró. No usar getSession()
-  // aquí (no valida el JWT). No insertar lógica entre createServerClient y
-  // getUser() que pueda cortar el refresco de cookies.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!regla) {
-    // Ruta pública: pasa intacta (con la sesión ya refrescada).
-    return respuesta;
-  }
-
-  if (!user) {
-    // Sin sesión → login, conservando a dónde quería ir.
-    const redireccion = redirigirALogin(request);
-    for (const cookie of respuesta.cookies.getAll()) {
-      redireccion.cookies.set(cookie);
-    }
-    return redireccion;
-  }
-
-  // Rol efectivo: profiles.tipo (RLS permite leer el propio perfil)
-  // + allowlist ADMIN_ALLOWED_EMAILS para admin.
-  const { data: perfil } = await supabase
-    .from("profiles")
-    .select("tipo")
-    .eq("id", user.id)
-    .maybeSingle();
-
+  // Rol efectivo: user.rol + allowlist ADMIN_ALLOWED_EMAILS para admin.
   const allowlist = parseAdminAllowlist(process.env.ADMIN_ALLOWED_EMAILS);
-  const rol = rolEfectivo(perfil?.tipo, user.email, allowlist);
+  const rol = rolEfectivo(sesion.user.rol, sesion.user.email, allowlist);
 
   if (!tienePermiso(rol, regla.roles)) {
     // Autenticado pero sin el rol requerido → 403 (no redirect en bucle).
-    const prohibido = new NextResponse(
+    return new NextResponse(
       "403 — Acceso denegado. Tu cuenta no tiene permisos para esta sección.",
       { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } },
     );
-    for (const cookie of respuesta.cookies.getAll()) {
-      prohibido.cookies.set(cookie);
-    }
-    return prohibido;
   }
 
-  return respuesta;
+  return NextResponse.next({ request });
 }
 
 export const config = {
+  // better-auth necesita Node (conexión Postgres a Neon); en Next 16 el proxy
+  // SIEMPRE corre en Node — declarar `runtime` aquí está prohibido y rompe
+  // el build ("Route segment config is not allowed in Proxy file").
   matcher: [
     /*
-     * Todas las rutas excepto estáticos: refrescar sesión en todo el sitio
-     * mantiene viva la cookie aunque el usuario navegue páginas públicas.
+     * Solo las zonas protegidas: la validación consulta la BD, no tiene
+     * sentido pagarla en cada página pública ni en estáticos.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|css|js|map)$).*)",
+    "/admin/:path*",
+    "/miembros/:path*",
   ],
 };

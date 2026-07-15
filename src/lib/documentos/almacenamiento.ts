@@ -3,12 +3,19 @@
  *
  * El bucket es PRIVADO: los objetos jamás tienen URL pública; el visor pide
  * una URL firmada de vida corta (ver src/lib/storage/firmadas.ts). Aquí se
- * centraliza el nombre del bucket, la derivación del formato y la construcción
- * de rutas de objeto deterministas y sin colisiones.
+ * centraliza el nombre del bucket, la derivación del formato, la construcción
+ * de rutas de objeto deterministas y las operaciones subir/leer/borrar, que
+ * ahora van a MinIO vía S3 (src/lib/storage/objetos.ts) en lugar de
+ * supabase.storage. Las firmas públicas de este módulo no cambiaron.
  */
 import { documentoSchema } from "@/lib/schemas";
+import {
+  eliminarObjetos,
+  obtenerObjeto,
+  subirObjeto,
+} from "@/lib/storage/objetos";
 
-/** Bucket PRIVADO de documentos en Supabase Storage. */
+/** Bucket lógico PRIVADO de documentos (prefijo en MinIO; ver lib/storage/s3.ts). */
 export const BUCKET_DOCUMENTOS = "documentos";
 
 /**
@@ -60,4 +67,38 @@ export function construirStoragePath(params: {
 }): string {
   const mm = String(params.mes).padStart(2, "0");
   return `${params.anio}/${mm}/${params.id}.${params.formato}`;
+}
+
+/**
+ * Sube el archivo de un documento al almacenamiento PRIVADO (MinIO).
+ * No sobrescribe: las rutas llevan UUID, una colisión sería un bug.
+ * ⚠️ Solo servidor (credenciales S3).
+ */
+export async function subirDocumento(
+  storagePath: string,
+  cuerpo: Uint8Array,
+  contentType: string,
+): Promise<void> {
+  await subirObjeto(BUCKET_DOCUMENTOS, storagePath, cuerpo, {
+    contentType,
+    sobrescribir: false,
+  });
+}
+
+/**
+ * Descarga el archivo de un documento a memoria (marca de agua, conversión a
+ * PDF vía Gotenberg). ⚠️ Solo servidor.
+ */
+export async function obtenerDocumento(
+  storagePath: string,
+): Promise<Uint8Array> {
+  return await obtenerObjeto(BUCKET_DOCUMENTOS, storagePath);
+}
+
+/**
+ * Borra el archivo de un documento (p. ej. rollback si falla el insert de
+ * metadatos en la BD). ⚠️ Solo servidor.
+ */
+export async function eliminarDocumento(storagePath: string): Promise<void> {
+  await eliminarObjetos(BUCKET_DOCUMENTOS, [storagePath]);
 }

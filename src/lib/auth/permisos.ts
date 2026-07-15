@@ -1,9 +1,9 @@
 /**
- * Reglas de rol PURAS (sin Next, sin Supabase, sin I/O).
+ * Reglas de rol PURAS (sin Next, sin better-auth, sin I/O).
  * Se comparten entre src/lib/auth/roles.ts (server components / handlers)
- * y src/proxy.ts (middleware), y se prueban de forma aislada con vitest.
+ * y src/proxy.ts (proxy/middleware), y se prueban de forma aislada con vitest.
  *
- * El rol vive en la columna `tipo` de la tabla `profiles` (src/db/schema.ts).
+ * El rol vive en la columna `rol` de la tabla `user` (src/db/schema.ts).
  */
 
 /** Rol de usuario — espeja el enum tipo_perfil de la BD. */
@@ -42,12 +42,12 @@ export function esAdminPermitido(
 /**
  * Rol efectivo de un usuario a partir de su perfil y su correo.
  *
- * Regla de seguridad: `profiles.tipo = 'admin'` NO basta — el correo además
+ * Regla de seguridad: `user.rol = 'admin'` NO basta — el correo además
  * debe estar en ADMIN_ALLOWED_EMAILS. Un perfil admin cuyo correo salió de
  * la allowlist queda SIN rol (null): defensa contra escalación por BD.
  *
- * @param tipo    Valor crudo de profiles.tipo (puede venir sucio de la BD).
- * @param correo  Correo del usuario autenticado (auth.users.email).
+ * @param tipo    Valor crudo de user.rol (puede venir sucio de la BD).
+ * @param correo  Correo del usuario autenticado (user.email).
  * @param allowlist  Resultado de parseAdminAllowlist(process.env.ADMIN_ALLOWED_EMAILS).
  * @returns El rol efectivo, o null si no tiene rol válido.
  */

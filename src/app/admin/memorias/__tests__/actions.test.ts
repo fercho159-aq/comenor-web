@@ -54,7 +54,10 @@ vi.mock("@/lib/auth/roles", () => {
 });
 
 // --- Mock de servicios externos que la acción importa a nivel de módulo -----
-vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: vi.fn() }));
+vi.mock("@/lib/storage/objetos", () => ({
+  subirObjeto: vi.fn().mockResolvedValue(undefined),
+  eliminarObjetos: vi.fn().mockResolvedValue(undefined),
+}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("sharp", () => ({ default: vi.fn() }));
 

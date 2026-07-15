@@ -33,3 +33,24 @@ Cada decisión técnica no obvia: **qué**, **por qué**, **alternativa descarta
 - **Qué:** Vitest con entorno jsdom y Testing Library; el alias `@/*` se replica en `vitest.config.ts`.
 - **Por qué:** comparte pipeline con Vite/esbuild (arranque rápido, TS sin configurar), y es lo que `PLAN.md` §1.2 fija como gate de CI.
 - **Alternativa descartada:** Jest — necesita transformer y config de ESM extra para React 19 y el alias, sin ventaja a cambio.
+
+## ADR-006 — Se suelta Supabase: auth + storage + PDF en infra propia
+
+- **Qué:** se elimina Supabase por completo. Auth pasa a **better-auth** dentro
+  del Next (usuarios y sesiones en la misma Neon Postgres, adaptador Drizzle, 3
+  roles: consejo | asociados | admin). Storage pasa a **MinIO** (S3-compatible)
+  en el VPS MAW Soluciones, con URLs firmadas de vida corta vía SDK S3. La
+  conversión Word/Excel → PDF del visor pasa a **Gotenberg**, también en el VPS.
+  Todo detrás de Caddy con TLS automático (`storage.comenor.org.mx`,
+  `docs.comenor.org.mx`). La app sigue en Vercel; el VPS solo aloja MinIO +
+  Gotenberg. La DB Neon ya existía y se conserva.
+- **Por qué:** consolidar en infraestructura propia ya pagada (el VPS del
+  cliente), quitar una dependencia externa y su capa de facturación, y eliminar
+  la deuda de mantener políticas RLS de Supabase — el control de acceso ahora
+  vive en el código (middleware de roles + `@/lib/auth`) con una sola fuente de
+  verdad. Las firmas públicas de `@/lib/auth` y `@/lib/storage` se mantuvieron
+  para no tocar a los ~40 consumidores.
+- **Alternativa descartada:** self-host de Supabase entero (Postgres + GoTrue +
+  Storage + PostgREST + Studio en el VPS) — demasiado peso operativo (media
+  docena de servicios, upgrades acoplados) para lo que en realidad usamos:
+  auth, storage y conversión, que se cubren con piezas más chicas y aisladas.

@@ -20,7 +20,7 @@ import { db } from "@/db";
 import { auditLog, events } from "@/db/schema";
 import { ErrorAutorizacion, requireRol } from "@/lib/auth/roles";
 import type { EventoInput } from "@/lib/schemas";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { subirObjeto, urlPublica } from "@/lib/storage/objetos";
 
 import { procesarImagenEvento } from "./imagen";
 import {
@@ -79,16 +79,12 @@ async function subirPortada(id: string, archivo: File): Promise<string> {
   const bytes = new Uint8Array(await archivo.arrayBuffer());
   const procesada = await procesarImagenEvento(bytes);
 
-  const supabase = createAdminClient();
   const path = construirImagenPathEvento(id);
-  const { error } = await supabase.storage
-    .from(BUCKET_EVENTOS)
-    .upload(path, procesada, { contentType: "image/webp", upsert: true });
-  if (error) {
-    throw new Error(`No se pudo subir la imagen: ${error.message}`);
-  }
-  const { data } = supabase.storage.from(BUCKET_EVENTOS).getPublicUrl(path);
-  return data.publicUrl;
+  await subirObjeto(BUCKET_EVENTOS, path, procesada, {
+    contentType: "image/webp",
+    sobrescribir: true,
+  });
+  return urlPublica(BUCKET_EVENTOS, path);
 }
 
 /** ¿El error de Postgres es una violación de índice único (slug repetido)? */

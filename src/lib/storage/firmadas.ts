@@ -1,36 +1,31 @@
 /**
- * URLs firmadas de Supabase Storage — PLAN.md §2.7.
+ * URLs firmadas de MinIO/S3 — PLAN.md §2.7.
  *
  * Regla: los documentos privados NUNCA tienen URL pública. El visor pide una
- * URL firmada de vida corta (60 s por defecto) justo antes de renderizar.
+ * URL firmada (presigned GET) de vida corta (60 s por defecto) justo antes de
+ * renderizar.
  *
- * SOLO SERVIDOR: usa `SUPABASE_SERVICE_ROLE_KEY`, que jamás debe llegar al
- * cliente. Importar este módulo desde un componente cliente es un error de
- * seguridad — el bundle expondría la service role key. Úsalo únicamente en
- * route handlers / server components, detrás del middleware de roles.
+ * ⚠️ SOLO SERVIDOR: firma con las credenciales S3 del servicio, que jamás
+ * deben llegar al cliente. Importar este módulo desde un componente cliente es
+ * un error de seguridad. Úsalo únicamente en route handlers / server
+ * components, detrás del middleware de roles.
+ *
+ * La firma pública de este módulo NO cambió al migrar de Supabase a MinIO:
+ * `urlFirmada(bucket, path, segundos)` sigue igual; el "bucket" lógico ahora
+ * es un prefijo dentro del bucket físico único (ver ./s3.ts).
  */
-import { createClient } from "@supabase/supabase-js";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+import { bucketS3, claveObjeto, clienteS3 } from "./s3";
 
 /** Vida por defecto de una URL firmada (segundos) — PLAN §2.7. */
 export const VIDA_URL_FIRMADA_SEGUNDOS = 60;
 
-function crearClienteAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error(
-      "Faltan NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY en el entorno (ver .env.example).",
-    );
-  }
-  return createClient(url, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
-
 /**
- * Genera una URL firmada de vida corta para un objeto de un bucket PRIVADO.
+ * Genera una URL firmada de vida corta para un objeto PRIVADO en MinIO.
  *
- * @param bucket   Bucket privado (p. ej. "documentos", "memorias").
+ * @param bucket   Bucket lógico (p. ej. "documentos", "memorias").
  * @param path     Ruta del objeto dentro del bucket (documents.storage_path).
  * @param segundos Vida de la URL; default 60 s. Se limita a máx. 300 s para
  *                 que nadie "alargue" documentos privados por accidente.
@@ -45,16 +40,15 @@ export async function urlFirmada(
   }
   const vida = Math.min(Math.max(Math.floor(segundos), 1), 300);
 
-  const supabase = crearClienteAdmin();
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .createSignedUrl(path, vida);
+  const comando = new GetObjectCommand({
+    Bucket: bucketS3(),
+    Key: claveObjeto(bucket, path),
+  });
 
-  if (error || !data?.signedUrl) {
-    throw new Error(
-      `No se pudo firmar la URL de ${bucket}/${path}: ${error?.message ?? "respuesta vacía"}`,
-    );
+  try {
+    return await getSignedUrl(clienteS3(), comando, { expiresIn: vida });
+  } catch (error) {
+    const mensaje = error instanceof Error ? error.message : "error desconocido";
+    throw new Error(`No se pudo firmar la URL de ${bucket}/${path}: ${mensaje}`);
   }
-
-  return data.signedUrl;
 }

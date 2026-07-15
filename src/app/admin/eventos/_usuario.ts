@@ -1,11 +1,12 @@
 /**
- * Deriva el nombre a mostrar en el encabezado del panel a partir del usuario de
- * Supabase. Usa `user_metadata.nombre`/`name` si existen; si no, la parte local
- * del correo; y como último recurso, "Administrador".
+ * Deriva el nombre a mostrar en el encabezado del panel a partir del usuario
+ * de la sesión (better-auth vía @/lib/auth/roles). Usa `user_metadata.nombre`/
+ * `name` si existen; si no, la parte local del correo; y como último recurso,
+ * "Administrador".
  */
-import type { User } from "@supabase/supabase-js";
+import type { UsuarioSesion } from "@/lib/auth/roles";
 
-export function nombrePanel(user: User): string {
+export function nombrePanel(user: UsuarioSesion): string {
   const meta = user.user_metadata as {
     nombre?: unknown;
     name?: unknown;
