@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useActionState, useState, type FormEvent } from "react";
 import { loginSchema } from "@/lib/schemas";
 import { BotonAccion, CampoFormulario } from "@/components/admin";
-import { estadoLoginInicial, iniciarSesion } from "./acciones";
+import { iniciarSesion } from "./acciones";
+import { estadoLoginInicial } from "./estado";
 
 type ErroresCliente = Partial<Record<"correo" | "password", string>>;
 

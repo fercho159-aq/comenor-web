@@ -7,20 +7,7 @@ import { loginSchema } from "@/lib/schemas";
 import { auth } from "@/lib/auth/config";
 import { ipConfiable } from "@/lib/net/ip";
 import { CAMPO_HONEYPOT, esHoneypotDisparado, limitar } from "@/lib/ratelimit";
-
-/** Errores por campo del formulario de login. */
-type ErroresLogin = Partial<Record<"correo" | "password", string[]>>;
-
-/** Estado que la server action devuelve al formulario (useActionState). */
-export type EstadoLogin = {
-  ok: boolean;
-  /** Mensaje general (credenciales inválidas, error de servicio). */
-  mensaje?: string;
-  /** Errores por campo (validación Zod del servidor). */
-  errores?: ErroresLogin;
-};
-
-export const estadoLoginInicial: EstadoLogin = { ok: false };
+import type { EstadoLogin } from "./estado";
 
 /**
  * Sanitiza el destino post-login: solo rutas internas relativas, para evitar
