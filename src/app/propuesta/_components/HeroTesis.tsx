@@ -80,47 +80,45 @@ export default function HeroTesis() {
           ))}
         </RevelarGrupo>
 
-        {/* Cabecera de especificación: tira de metadatos */}
+        {/* Fila baja asimétrica: CTAs a la izquierda ↔ metadatos a la derecha */}
         <Revelar as="div" delay={0.35}>
-          <dl className="mt-10 grid max-w-[34rem] grid-cols-2 gap-x-8 gap-y-6 sm:flex sm:max-w-none sm:flex-wrap sm:items-start sm:gap-x-8 sm:gap-y-3">
-            {METADATOS.map((m, i) => (
-              <div
-                key={m.etiqueta}
-                className="relative sm:pl-8 sm:first:pl-0"
+          <div className="mt-12 flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+            {/* CTAs — esquinas rectas (instrumento de precisión, anti-pill decorativa) */}
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/nosotros"
+                className="inline-flex items-center justify-center bg-verde px-7 py-3.5 text-sm font-bold tracking-wide text-blanco transition-colors duration-150 hover:bg-verde-700"
               >
-                {/* Divisor: punto vino de 4px entre ítems (solo en fila sm+) */}
-                {i > 0 && (
-                  <span
-                    aria-hidden
-                    className="absolute left-0 top-2 hidden h-1 w-1 rounded-full bg-vino sm:block"
-                  />
-                )}
-                <dt className="text-[0.6875rem] font-normal uppercase tracking-[0.18em] text-tinta-suave">
-                  {m.etiqueta}
-                </dt>
-                <dd className="mt-1 text-lg font-bold tabular-nums text-verde">
-                  {m.valor}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </Revelar>
+                Conoce COMENOR
+              </Link>
+              <a
+                href="#ecosistema"
+                className="inline-flex items-center justify-center border-2 border-verde px-7 py-3 text-sm font-bold tracking-wide text-verde transition-colors duration-150 hover:bg-verde hover:text-blanco"
+              >
+                Nuestro ecosistema
+              </a>
+            </div>
 
-        {/* CTAs — esquinas rectas (instrumento de precisión, anti-pill decorativa) */}
-        <Revelar as="div" delay={0.45}>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <Link
-              href="/nosotros"
-              className="inline-flex items-center justify-center bg-verde px-7 py-3.5 text-sm font-bold tracking-wide text-blanco transition-colors duration-150 hover:bg-verde-700"
-            >
-              Conoce COMENOR
-            </Link>
-            <a
-              href="#ecosistema"
-              className="inline-flex items-center justify-center border-2 border-verde px-7 py-3 text-sm font-bold tracking-wide text-verde transition-colors duration-150 hover:bg-verde hover:text-blanco"
-            >
-              Nuestro ecosistema
-            </a>
+            {/* Cabecera de especificación: tira de metadatos */}
+            <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:flex sm:flex-wrap sm:items-start sm:gap-x-8 sm:gap-y-3">
+              {METADATOS.map((m, i) => (
+                <div key={m.etiqueta} className="relative sm:pl-8 sm:first:pl-0">
+                  {/* Divisor: punto vino de 4px entre ítems (solo en fila sm+) */}
+                  {i > 0 && (
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-2 hidden h-1 w-1 rounded-full bg-vino sm:block"
+                    />
+                  )}
+                  <dt className="text-[0.6875rem] font-normal uppercase tracking-[0.18em] text-tinta-suave">
+                    {m.etiqueta}
+                  </dt>
+                  <dd className="mt-1 text-lg font-bold tabular-nums text-verde">
+                    {m.valor}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </Revelar>
 

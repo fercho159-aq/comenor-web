@@ -1,61 +1,51 @@
 import { Revelar } from "@/components/anim";
 
 /**
- * Sección 01 · INSTITUCIÓN — "¿Quiénes somos?"
+ * Sección "¿Quiénes somos?" (id: institucion).
  *
- * Dirección de diseño "Norma": sección clara sobre fondo humo, la primera con
- * LOMO DE REFERENCIA (spine). Server Component; la animación de entrada vive en
- * <Revelar> (client) que se importa sin convertir este archivo en cliente.
- *
- * Layout:
- * - lg: retícula grid-cols-[7rem_1fr] gap-10. La primera celda es el spine
- *   (índice tabular '01', etiqueta 'INSTITUCIÓN', tick vino). La columna de
- *   contenido lleva una hairline vertical salvia (border-l) que traza el margen
- *   continuo del "documento".
- * - <lg: el spine colapsa a un eyebrow horizontal encima del H2.
+ * Dirección "Norma", ritmo variado: split editorial asimétrico 4/8 en lg —
+ * columna izquierda con eyebrow, H2 y la declaración-ancla (pull-quote);
+ * columna derecha con el cuerpo. Sin lomo numerado: la numeración de sección
+ * leía como línea de tiempo.
  *
  * Copy literal de design-source/text/presentacion.txt (L18-42, L86-87).
- * Cero texto inventado. Énfasis = bold del mismo color (nunca vino en texto).
+ * Cero texto inventado. Énfasis = bold del mismo color.
  */
 export default function DefinicionInstitucional() {
   return (
     <section id="institucion" className="bg-humo py-20 lg:py-32">
       <div className="mx-auto w-full max-w-[75rem] px-6 sm:px-8 lg:px-12">
-        <div className="lg:grid lg:grid-cols-[7rem_minmax(0,1fr)] lg:gap-10">
-          {/* Spine (lomo de referencia) — solo desktop */}
-          <div className="hidden lg:flex lg:flex-col lg:items-start lg:pt-2">
-            <span className="font-light tabular-nums text-[1.5rem] leading-none text-verde">
-              01
-            </span>
-            <span className="mt-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
+          {/* Columna editorial: eyebrow + título + declaración-ancla */}
+          <div className="lg:col-span-4">
+            <p className="flex items-center gap-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+              <span aria-hidden className="block h-0.5 w-6 bg-vino" />
               Institución
-            </span>
-            <span aria-hidden className="mt-4 block h-[2px] w-3 bg-vino" />
-          </div>
-
-          {/* Columna de contenido con la hairline salvia como margen del documento */}
-          <div className="lg:border-l lg:border-salvia lg:pl-10">
-            {/* Spine colapsado a eyebrow inline — solo móvil/tablet */}
-            <p className="mb-6 flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave lg:hidden">
-              <span className="tabular-nums text-verde">01</span>
-              <span aria-hidden>·</span>
-              <span>Institución</span>
-              <span
-                aria-hidden
-                className="ml-1 inline-block h-[11px] w-[3px] bg-vino"
-              />
             </p>
 
             <Revelar
               as="h2"
-              className="max-w-[20ch] text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] font-bold leading-[1.1] tracking-[-0.01em] text-verde text-balance"
+              className="mt-5 max-w-[20ch] text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] font-bold leading-[1.1] tracking-[-0.01em] text-verde text-balance"
             >
               ¿Quiénes somos?
             </Revelar>
 
+            {/* Declaración-ancla institucional (pull-quote, sin fondo de color) */}
+            <Revelar
+              as="blockquote"
+              delay={0.15}
+              className="mt-10 hidden max-w-[20ch] border-t border-salvia pt-8 text-[clamp(1.375rem,1rem+1.25vw,1.625rem)] font-bold leading-[1.25] tracking-[-0.01em] text-verde text-balance lg:block"
+            >
+              COMENOR: la casa de todos los actores de la infraestructura de la
+              calidad.
+            </Revelar>
+          </div>
+
+          {/* Columna de cuerpo */}
+          <div className="mt-8 lg:col-span-8 lg:mt-0 lg:border-l lg:border-salvia lg:pl-12">
             <Revelar
               delay={0.1}
-              className="mt-8 max-w-[62ch] space-y-6 text-[1.0625rem] leading-[1.65] text-tinta lg:text-[1.125rem]"
+              className="max-w-[62ch] space-y-6 text-[1.0625rem] leading-[1.65] text-tinta lg:text-[1.125rem]"
             >
               <p className="text-pretty">
                 El Consejo Mexicano de Normalización y Evaluación de la
@@ -82,11 +72,11 @@ export default function DefinicionInstitucional() {
               </p>
             </Revelar>
 
-            {/* Declaración-ancla institucional (pull-quote, sin fondo de color) */}
+            {/* En móvil/tablet la declaración-ancla cierra la sección */}
             <Revelar
               as="blockquote"
               delay={0.15}
-              className="mt-12 max-w-[24ch] border-t border-salvia pt-10 text-[clamp(1.5rem,1rem+1.5vw,1.75rem)] font-bold leading-[1.2] tracking-[-0.01em] text-verde text-balance"
+              className="mt-10 max-w-[24ch] border-t border-salvia pt-8 text-[clamp(1.375rem,1rem+1.25vw,1.625rem)] font-bold leading-[1.25] tracking-[-0.01em] text-verde text-balance lg:hidden"
             >
               COMENOR: la casa de todos los actores de la infraestructura de la
               calidad.

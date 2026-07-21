@@ -1,19 +1,16 @@
 import { Revelar, RevelarGrupo } from "@/components/anim";
 
 /**
- * Sección #3 · id="paraguas" — "Organismo Paraguas".
+ * Sección "Organismo Paraguas" (id: paraguas).
  *
- * Primera ancla oscura de la página (banda verde full-bleed, `.tema-oscuro`
- * para el anillo de foco blanco). No es una tarjeta-diapositiva: es una
- * declaración manifiesto alineada a la izquierda sobre la retícula del
- * "documento normativo", con el lomo de referencia (spine) en el margen.
+ * Primera ancla oscura de la página (banda verde full-bleed, `.tema-oscuro`).
+ * Ritmo variado: split 3/2 en lg — manifiesto grande en peso ligero a la
+ * izquierda, Mandato Estatutario como bloque de referencia a la derecha; las
+ * cuatro dimensiones cierran en una fila full-width de 4 columnas. Sin lomo
+ * numerado (leía como línea de tiempo).
  *
- * Copy: transcripción institucional del cliente
- * (design-source/text/presentacion.txt, L93-104 y L109-115). Cero texto inventado.
- *
- * Server Component: sin estado ni handlers. La animación de entrada la aportan
- * los islands cliente <Revelar>/<RevelarGrupo> (SSR-safe, respetan
- * prefers-reduced-motion).
+ * Copy: design-source/text/presentacion.txt L93-115. Cero texto inventado.
+ * Server Component; el movimiento vive en <Revelar>/<RevelarGrupo> (client).
  */
 
 const DIMENSIONES = [
@@ -37,30 +34,13 @@ export default function OrganismoParaguas() {
       aria-labelledby="paraguas-titulo"
       className="tema-oscuro bg-verde text-blanco"
     >
-      <div className="mx-auto w-full max-w-[75rem] px-6 py-24 sm:px-8 lg:grid lg:grid-cols-[7rem_minmax(0,1fr)] lg:gap-10 lg:px-12 lg:py-40">
-        {/* Lomo de referencia (spine) — solo desktop */}
-        <div className="hidden lg:flex lg:flex-col lg:items-start lg:gap-3">
-          <span className="text-[1.5rem] font-light leading-none tabular-nums text-salvia">
-            03
-          </span>
-          <span className="text-[0.6875rem] font-medium uppercase leading-tight tracking-[0.18em] text-salvia/80">
-            Organismo
-            <br />
-            Paraguas
-          </span>
-          <span aria-hidden className="mt-1 block h-0.5 w-3 bg-vino" />
-        </div>
+      <div className="mx-auto w-full max-w-[75rem] px-6 py-24 sm:px-8 lg:px-12 lg:py-36">
+        <p className="flex items-center gap-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-salvia/80">
+          <span aria-hidden className="block h-0.5 w-6 bg-vino" />
+          Organismo Paraguas
+        </p>
 
-        {/* Columna de contenido — hairline continua del "documento" */}
-        <div className="lg:border-l lg:border-salvia/20 lg:pl-10">
-          {/* Spine colapsado a eyebrow horizontal en <lg */}
-          <p className="mb-6 flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-salvia/80 lg:hidden">
-            <span className="tabular-nums text-salvia">03</span>
-            <span aria-hidden>·</span>
-            <span>Organismo Paraguas</span>
-            <span aria-hidden className="ml-1 h-0.5 w-3 bg-vino" />
-          </p>
-
+        <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-x-16">
           {/* Declaración manifiesto (peso ligero grande = anti-slide) */}
           <Revelar
             as="h2"
@@ -80,35 +60,12 @@ export default function OrganismoParaguas() {
             </span>
           </Revelar>
 
-          {/* Las cuatro dimensiones como taxonomía inline (no tarjetas sólidas) */}
-          <RevelarGrupo
-            as="dl"
-            className="mt-14 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-4"
-          >
-            {DIMENSIONES.map((d) => (
-              <div
-                key={d.nombre}
-                className="border-t border-salvia/20 pt-5 sm:border-t-0 sm:border-l sm:pl-5 sm:pt-0"
-              >
-                <dt className="text-[1.125rem] font-bold leading-snug text-blanco">
-                  {d.nombre}
-                </dt>
-                <dd className="mt-1 text-[0.9375rem] leading-snug text-salvia">
-                  {d.detalle}
-                </dd>
-              </div>
-            ))}
-          </RevelarGrupo>
-
-          {/* Mandato Estatutario — fila de referencia pequeña */}
-          <div className="mt-16 border-t border-salvia/20 pt-10">
+          {/* Mandato Estatutario — bloque de referencia lateral */}
+          <div className="mt-14 lg:mt-0 lg:border-l lg:border-salvia/20 lg:pl-10">
             <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-salvia">
               Mandato Estatutario — Estatutos COMENOR, reformados julio 2024
             </p>
-            <RevelarGrupo
-              as="ul"
-              className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2"
-            >
+            <RevelarGrupo as="ul" className="mt-6 space-y-5">
               {MANDATO.map((punto) => (
                 <li
                   key={punto}
@@ -124,6 +81,30 @@ export default function OrganismoParaguas() {
             </RevelarGrupo>
           </div>
         </div>
+
+        {/* Las cuatro dimensiones — fila full-width de cierre */}
+        <RevelarGrupo
+          as="dl"
+          className="mt-16 grid grid-cols-1 gap-y-6 border-t border-salvia/20 pt-10 sm:grid-cols-2 sm:gap-x-8 lg:mt-20 lg:grid-cols-4"
+        >
+          {DIMENSIONES.map((d, i) => (
+            <div
+              key={d.nombre}
+              className={
+                i > 0
+                  ? "sm:border-l sm:border-salvia/20 sm:pl-6"
+                  : undefined
+              }
+            >
+              <dt className="text-[1.125rem] font-bold leading-snug text-blanco">
+                {d.nombre}
+              </dt>
+              <dd className="mt-1 text-[0.9375rem] leading-snug text-salvia">
+                {d.detalle}
+              </dd>
+            </div>
+          ))}
+        </RevelarGrupo>
       </div>
     </section>
   );

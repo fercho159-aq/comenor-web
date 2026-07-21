@@ -1,15 +1,13 @@
 import { Revelar, RevelarGrupo } from "@/components/anim";
 
 /**
- * Sección 04 — AGENDA · "Agenda COMENOR"
+ * Sección "Agenda COMENOR" (id: agenda).
  *
- * Dirección "Norma": la página se lee como especificación técnica.
- * Retícula con LOMO DE REFERENCIA (spine) en el margen izquierdo sobre lg
- * (índice "04" + etiqueta "AGENDA" + tick vino). Bajo lg el spine colapsa a
- * una fila-eyebrow horizontal encima del H2.
- *
- * Server Component. La interacción (reveal en scroll) se delega a los
- * componentes cliente <Revelar>/<RevelarGrupo> de @/components/anim.
+ * Ritmo variado: la introducción es un split horizontal (H2 a la izquierda,
+ * párrafos a la derecha en lg) y los cuatro ejes van en una CUADRÍCULA 2×2 de
+ * celdas con hairlines salvia — no una lista vertical numerada (leía como
+ * línea de tiempo). El índice grande dentro de cada celda es contenido (Eje
+ * 1–4 de la fuente).
  *
  * Copy: design-source/text/presentacion.txt L180-289. Cero texto inventado.
  * NOTA(copy): el PPT dice "buscar impulsar" (typo); se publica la corrección
@@ -61,8 +59,7 @@ const EJES: Eje[] = [
   },
   {
     indice: "4",
-    titulo:
-      "Agenda regional & internacional y cooperación técnica",
+    titulo: "Agenda regional & internacional y cooperación técnica",
     objetivo:
       "Que COMENOR juegue en liga regional/internacional, no solo local.",
     lineas: [
@@ -82,53 +79,31 @@ export default function AgendaEjes() {
       className="bg-humo py-20 lg:py-32"
     >
       <div className="mx-auto w-full max-w-[75rem] px-6 sm:px-8 lg:px-12">
-        <div className="lg:grid lg:grid-cols-[7rem_minmax(0,1fr)]">
-          {/* LOMO DE REFERENCIA (spine) — solo desktop, alineado al inicio */}
-          <div className="hidden lg:block lg:pr-6">
-            <div className="flex flex-col items-start">
-              <span className="font-light tabular-nums text-[1.5rem] leading-none text-verde">
-                04
-              </span>
-              <span className="mt-3 text-[0.6875rem] font-medium uppercase leading-tight tracking-[0.18em] text-tinta-suave">
-                Agenda
-              </span>
-              {/* tick vino — frontera de sección (uso quirúrgico del acento) */}
-              <span
-                aria-hidden="true"
-                className="mt-4 block h-[2px] w-3 bg-vino"
-              />
-            </div>
-          </div>
-
-          {/* Columna de contenido — hairline vertical salvia = margen del documento */}
-          <div className="lg:border-l lg:border-salvia lg:pl-10">
-            {/* Spine colapsado a eyebrow horizontal — solo móvil/tablet */}
-            <p className="mb-6 flex items-center gap-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave lg:hidden">
-              <span className="font-light tabular-nums text-tinta">04</span>
-              <span aria-hidden="true">·</span>
-              <span>Agenda</span>
-              <span
-                aria-hidden="true"
-                className="ml-1 inline-block h-3 w-[3px] bg-vino"
-              />
-            </p>
-
-            <Revelar>
+        {/* Introducción: split horizontal título ↔ postura */}
+        <Revelar>
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
+            <div className="lg:col-span-5">
+              <p className="flex items-center gap-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+                <span aria-hidden className="block h-0.5 w-6 bg-vino" />
+                Nuestro trabajo
+              </p>
               <h2
                 id="agenda-titulo"
-                className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] font-bold leading-[1.1] tracking-[-0.01em] text-verde"
+                className="mt-5 text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] font-bold leading-[1.1] tracking-[-0.01em] text-verde"
               >
                 Agenda COMENOR
               </h2>
+            </div>
 
-              <p className="mt-6 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
+            <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-1">
+              <p className="max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
                 COMENOR busca impulsar una Infraestructura de la Calidad
                 moderna, confiable e incluyente, capaz de responder a los retos
                 productivos, regulatorios y sociales del país.
               </p>
 
               {/* Tríada "no X, sino Y" — declaración distintiva */}
-              <p className="mt-6 max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
+              <p className="max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
                 Nuestra agenda no busca más reglas, sino{" "}
                 <b className="font-bold text-verde">mejores decisiones</b>; no
                 más trámites, sino{" "}
@@ -136,69 +111,65 @@ export default function AgendaEjes() {
                 fragmentación, sino{" "}
                 <b className="font-bold text-verde">visión de Estado</b>.
               </p>
-            </Revelar>
-
-            {/* Ejes temáticos — agenda editorial numerada */}
-            <RevelarGrupo
-              as="ol"
-              stagger={0.1}
-              className="mt-14 list-none"
-            >
-              {EJES.map((eje) => (
-                <li
-                  key={eje.indice}
-                  className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-4 border-t border-salvia py-8"
-                >
-                  {/* Índice grande — Montserrat 300 tabular */}
-                  <span
-                    aria-hidden="true"
-                    className="font-light tabular-nums text-[clamp(2.25rem,1.6rem+2vw,3rem)] leading-none text-verde"
-                  >
-                    {eje.indice}
-                  </span>
-
-                  <div className="min-w-0">
-                    <h3 className="text-[1.125rem] font-bold uppercase leading-snug tracking-[0.01em] text-verde">
-                      {eje.titulo}
-                    </h3>
-
-                    {/* Objetivo del eje, tratado como cita */}
-                    <p className="mt-4 max-w-[62ch]">
-                      <span className="mb-1 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
-                        Objetivo
-                      </span>
-                      <span className="block text-pretty text-[1.0625rem] leading-[1.55] text-tinta">
-                        {eje.objetivo}
-                      </span>
-                    </p>
-
-                    {/* Líneas de acción — la "escala": cada ítem marcado con un
-                        tick salvia (el vocabulario de medición de la sección) */}
-                    <div className="mt-5 max-w-[62ch]">
-                      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
-                        Líneas de acción
-                      </p>
-                      <ul className="space-y-2">
-                        {eje.lineas.map((linea) => (
-                          <li
-                            key={linea}
-                            className="flex gap-3 text-[0.9375rem] leading-[1.5] text-tinta-suave"
-                          >
-                            <span
-                              aria-hidden="true"
-                              className="mt-[0.6em] block h-px w-3 shrink-0 bg-salvia"
-                            />
-                            <span className="min-w-0 text-pretty">{linea}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </RevelarGrupo>
+            </div>
           </div>
-        </div>
+        </Revelar>
+
+        {/* Ejes temáticos — cuadrícula 2×2 de celdas hairline */}
+        <RevelarGrupo
+          as="ol"
+          stagger={0.1}
+          className="mt-14 grid list-none grid-cols-1 border-t border-salvia sm:border-l lg:mt-20 lg:grid-cols-2"
+        >
+          {EJES.map((eje) => (
+            <li
+              key={eje.indice}
+              className="border-b border-salvia p-7 sm:border-r lg:p-10"
+            >
+              {/* Índice del eje — contenido de la fuente, Montserrat 300 */}
+              <span
+                aria-hidden="true"
+                className="block font-light tabular-nums text-[clamp(2.25rem,1.6rem+2vw,3rem)] leading-none text-verde"
+              >
+                {eje.indice}
+              </span>
+
+              <h3 className="mt-4 text-[1.125rem] font-bold uppercase leading-snug tracking-[0.01em] text-verde">
+                {eje.titulo}
+              </h3>
+
+              <p className="mt-4 max-w-[52ch]">
+                <span className="mb-1 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+                  Objetivo
+                </span>
+                <span className="block text-pretty text-[1.0625rem] leading-[1.55] text-tinta">
+                  {eje.objetivo}
+                </span>
+              </p>
+
+              {/* Líneas de acción — cada ítem con tick salvia (vocabulario de medición) */}
+              <div className="mt-5 max-w-[52ch]">
+                <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+                  Líneas de acción
+                </p>
+                <ul className="space-y-2">
+                  {eje.lineas.map((linea) => (
+                    <li
+                      key={linea}
+                      className="flex gap-3 text-[0.9375rem] leading-[1.5] text-tinta-suave"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-[0.6em] block h-px w-3 shrink-0 bg-salvia"
+                      />
+                      <span className="min-w-0 text-pretty">{linea}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))}
+        </RevelarGrupo>
       </div>
     </section>
   );
