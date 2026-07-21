@@ -69,6 +69,8 @@ export default function OrganismoParaguas() {
             as="h2"
             className="max-w-[30ch] text-balance text-[clamp(1.5rem,1rem+2vw,2.25rem)] font-light leading-[1.25] tracking-[-0.005em] text-blanco"
           >
+            {/* Reducción editorial: se omite la cláusula final ("vinculando
+                organismos…"); las cuatro dimensiones de abajo ya la muestran. */}
             <span id="paraguas-titulo">
               Somos el <strong className="font-bold">organismo paraguas</strong>{" "}
               que representa y articula el ecosistema nacional de
@@ -77,9 +79,8 @@ export default function OrganismoParaguas() {
               <strong className="font-bold">
                 interlocutor técnico e institucional
               </strong>{" "}
-              ante el gobierno, el sector productivo y los foros internacionales
-              — vinculando organismos de normalización, certificación,
-              laboratorios y unidades de inspección acreditados.
+              ante el gobierno, el sector productivo y los foros
+              internacionales.
             </span>
           </Revelar>
 

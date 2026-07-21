@@ -1,5 +1,5 @@
 import { Revelar } from "@/components/anim";
-import { Foto } from "@/components/ui";
+import { Boton, Foto } from "@/components/ui";
 
 /**
  * Sección "¿Quiénes somos?" (id: institucion).
@@ -44,9 +44,11 @@ export default function DefinicionInstitucional() {
 
           {/* Columna de cuerpo */}
           <div className="mt-8 lg:col-span-8 lg:mt-0 lg:border-l lg:border-salvia lg:pl-12">
+            {/* Reducción editorial: solo el párrafo-definición; el resto del
+                texto institucional vive completo en /nosotros. */}
             <Revelar
               delay={0.1}
-              className="max-w-[62ch] space-y-6 text-[1.0625rem] leading-[1.65] text-tinta lg:text-[1.125rem]"
+              className="max-w-[62ch] text-[1.0625rem] leading-[1.65] text-tinta lg:text-[1.125rem]"
             >
               <p className="text-pretty">
                 El Consejo Mexicano de Normalización y Evaluación de la
@@ -57,20 +59,12 @@ export default function DefinicionInstitucional() {
                 </strong>{" "}
                 más eficiente, incluyente, accesible y competitiva para México.
               </p>
-              <p className="text-pretty">
-                Estamos integrados por algunos de los actores más relevantes del
-                ecosistema de la calidad, entre ellos Organismos Nacionales de
-                Normalización, Organismos Nacionales de Certificación de
-                Productos y Sistemas de Gestión, Laboratorios de Ensayo y
-                Unidades de Verificación de Información Comercial e Instalaciones
-                Eléctricas.
-              </p>
-              <p className="text-pretty">
-                Nuestro compromiso es promover la cultura de la calidad, la
-                confianza y la competitividad, contribuyendo al desarrollo
-                económico, la innovación y el fortalecimiento de los mercados a
-                través de la normalización y la evaluación de la conformidad.
-              </p>
+            </Revelar>
+
+            <Revelar delay={0.15} className="mt-8">
+              <Boton href="/nosotros" variante="secundario">
+                Conoce nuestra institución
+              </Boton>
             </Revelar>
 
             {/* Asamblea COMENOR — la institución en persona */}

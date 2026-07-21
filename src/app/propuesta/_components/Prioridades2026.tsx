@@ -36,8 +36,9 @@ const PRIORIDADES: readonly Prioridad[] = [
     indice: "01",
     icono: ScrollText,
     titulo: "Reglamento de la LIC — el obstáculo estructural",
+    // Reducción editorial: se omite la cláusula final de la fuente.
     descripcion:
-      "Pendiente desde agosto 2021. Sin él, la transición ONN→ONE está bloqueada y 490+ NMX de seis organismos miembros permanecen represadas — erosionando 30 años de propiedad intelectual normativa mexicana.",
+      "Pendiente desde agosto 2021. Sin él, la transición ONN→ONE está bloqueada y 490+ NMX de seis organismos miembros permanecen represadas.",
     critico: true,
   },
   {
@@ -45,14 +46,14 @@ const PRIORIDADES: readonly Prioridad[] = [
     icono: Handshake,
     titulo: "T-MEC Capítulo 11 — posicionamiento soberano",
     descripcion:
-      "México requiere posicionamientos técnicos propios en barreras no arancelarias y convergencia normativa trilateral. COMENOR debe ser la voz del ecosistema en esta mesa.",
+      "México requiere posicionamientos técnicos propios en barreras no arancelarias y convergencia normativa trilateral.",
   },
   {
     indice: "03",
     icono: Landmark,
     titulo: "Mesas institucionales",
     descripcion:
-      "Posicionamientos técnicos de COMENOR, con agenda estructurada ante Autoridades. La incidencia no puede ser episódica — debe ser institucionalizada.",
+      "Posicionamientos técnicos de COMENOR, con agenda estructurada ante Autoridades.",
   },
   {
     indice: "04",

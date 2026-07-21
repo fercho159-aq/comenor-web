@@ -6,7 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
-import { ChipIcono, Foto } from "@/components/ui";
+import { Boton, ChipIcono, Foto } from "@/components/ui";
 
 /**
  * Sección "Agenda COMENOR" (id: agenda).
@@ -26,7 +26,6 @@ type Eje = {
   indice: string;
   titulo: string;
   objetivo: string;
-  lineas: string[];
   icono: LucideIcon;
 };
 
@@ -37,24 +36,12 @@ const EJES: Eje[] = [
     titulo: "Incidencia de política pública y regulación",
     objetivo:
       "Que COMENOR esté en la mesa donde se decide, no en la sala de espera.",
-    lineas: [
-      "Seguimiento estructurado a iniciativas de ley, reglamentos, NOMs, acuerdos y políticas públicas que impactan la IC, así como tratados internacionales.",
-      "Posicionamientos técnicos consensuados (no opiniones, criterios).",
-      "Mesas de diálogo con dependencias clave (SE, COFEPRIS, SENER, STPS, CRT).",
-      "Propuestas proactivas de mejora regulatoria.",
-    ],
   },
   {
     indice: "2",
     icono: Users,
     titulo: "Representatividad y voz del ecosistema",
     objetivo: "Que los organismos vean a COMENOR como su casa política común.",
-    lineas: [
-      "Activación de comisiones temáticas (por sector o transversal).",
-      "Consultas internas ágiles para construir postura colectiva.",
-      "Informes semestrales de impacto normativo para asociados.",
-      "Promoción de servicios de asociados y miembros.",
-    ],
   },
   {
     indice: "3",
@@ -62,12 +49,6 @@ const EJES: Eje[] = [
     titulo: "Infraestructura de la Calidad como motor económico",
     objetivo:
       "Pasar del discurso técnico al lenguaje de competitividad y negocio.",
-    lineas: [
-      "Narrativa clara de la Infraestructura de la Calidad como habilitador de comercio e inversión.",
-      "Análisis sectoriales: costos de incumplimiento vs beneficios de la conformidad.",
-      "Vinculación con cámaras, asociaciones y cadenas de valor.",
-      "Posicionamiento de la evaluación de la conformidad como inversión, no gasto.",
-    ],
   },
   {
     indice: "4",
@@ -75,12 +56,6 @@ const EJES: Eje[] = [
     titulo: "Agenda regional & internacional y cooperación técnica",
     objetivo:
       "Que COMENOR juegue en liga regional/internacional, no solo local.",
-    lineas: [
-      "Fortalecer vínculos con organismos homólogos y foros regionales/internacionales.",
-      "Participación activa en agendas bilaterales y multilaterales.",
-      "Transferencia de buenas prácticas globales al contexto mexicano.",
-      "Posicionamiento de México como referente regional en el sector.",
-    ],
   },
 ];
 
@@ -108,14 +83,9 @@ export default function AgendaEjes() {
               </h2>
             </div>
 
-            <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-1">
-              <p className="max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
-                COMENOR busca impulsar una Infraestructura de la Calidad
-                moderna, confiable e incluyente, capaz de responder a los retos
-                productivos, regulatorios y sociales del país.
-              </p>
-
-              {/* Tríada "no X, sino Y" — declaración distintiva */}
+            {/* Reducción editorial: solo la tríada distintiva; el párrafo
+                introductorio completo vive en /ejes. */}
+            <div className="mt-6 lg:col-span-7 lg:mt-1">
               <p className="max-w-[60ch] text-pretty text-[1.0625rem] leading-[1.65] text-tinta">
                 Nuestra agenda no busca más reglas, sino{" "}
                 <b className="font-bold text-verde">mejores decisiones</b>; no
@@ -165,6 +135,8 @@ export default function AgendaEjes() {
                 {eje.titulo}
               </h3>
 
+              {/* Reducción editorial: solo el objetivo; las líneas de acción
+                  de cada eje viven completas en /ejes. */}
               <p className="mt-4 max-w-[52ch]">
                 <span className="mb-1 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
                   Objetivo
@@ -173,30 +145,16 @@ export default function AgendaEjes() {
                   {eje.objetivo}
                 </span>
               </p>
-
-              {/* Líneas de acción — cada ítem con tick salvia (vocabulario de medición) */}
-              <div className="mt-5 max-w-[52ch]">
-                <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
-                  Líneas de acción
-                </p>
-                <ul className="space-y-2">
-                  {eje.lineas.map((linea) => (
-                    <li
-                      key={linea}
-                      className="flex gap-3 text-[0.9375rem] leading-[1.5] text-tinta-suave"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="mt-[0.6em] block h-px w-3 shrink-0 bg-salvia"
-                      />
-                      <span className="min-w-0 text-pretty">{linea}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </li>
           ))}
         </RevelarGrupo>
+
+        {/* El detalle (líneas de acción por eje) vive en /ejes */}
+        <Revelar as="div" className="mt-12">
+          <Boton href="/ejes" variante="secundario">
+            Ver la agenda completa
+          </Boton>
+        </Revelar>
       </div>
     </section>
   );
