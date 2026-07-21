@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Mail, Phone, type LucideIcon } from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
+import { ChipIcono } from "@/components/ui";
 
 /**
  * Sección "Cierre / Contacto" (id: cierre).
@@ -22,16 +24,19 @@ const CANALES: ReadonlyArray<{
   etiqueta: string;
   dato: string;
   href: string;
+  icono: LucideIcon;
 }> = [
   {
     etiqueta: "Mail",
     dato: "direccioncomenor@comenor.org.mx",
     href: "mailto:direccioncomenor@comenor.org.mx",
+    icono: Mail,
   },
   {
     etiqueta: "Teléfono & WhatsApp",
     dato: "55 2745 3035",
     href: "tel:+525527453035",
+    icono: Phone,
   },
 ];
 
@@ -76,17 +81,23 @@ export default function CierreContacto() {
           {/* Columna de referencia: canales directos + redes */}
           <div className="mt-14 lg:col-span-5 lg:mt-0 lg:border-l lg:border-salvia lg:pl-12">
             <RevelarGrupo as="ul" stagger={0.06} className="space-y-8">
-              {CANALES.map(({ etiqueta, dato, href }) => (
-                <li key={etiqueta} className="border-t border-salvia pt-5 lg:border-t-0 lg:pt-0">
-                  <span className="block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
-                    {etiqueta}
+              {CANALES.map(({ etiqueta, dato, href, icono }) => (
+                <li
+                  key={etiqueta}
+                  className="flex items-start gap-4 border-t border-salvia pt-5 lg:border-t-0 lg:pt-0"
+                >
+                  <ChipIcono icon={icono} tamano="sm" className="mt-0.5" />
+                  <span className="min-w-0">
+                    <span className="block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-tinta-suave">
+                      {etiqueta}
+                    </span>
+                    <a
+                      href={href}
+                      className="mt-2 inline-block break-all text-[1.125rem] font-bold text-verde underline decoration-1 underline-offset-4 transition-colors hover:text-verde-700"
+                    >
+                      {dato}
+                    </a>
                   </span>
-                  <a
-                    href={href}
-                    className="mt-2 inline-block break-all text-[1.125rem] font-bold text-verde underline decoration-1 underline-offset-4 transition-colors hover:text-verde-700"
-                  >
-                    {dato}
-                  </a>
                 </li>
               ))}
             </RevelarGrupo>

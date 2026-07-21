@@ -1,4 +1,5 @@
 import { Revelar } from "@/components/anim";
+import { Foto } from "@/components/ui";
 
 /**
  * Sección "¿Quiénes somos?" (id: institucion).
@@ -70,6 +71,18 @@ export default function DefinicionInstitucional() {
                 económico, la innovación y el fortalecimiento de los mercados a
                 través de la normalización y la evaluación de la conformidad.
               </p>
+            </Revelar>
+
+            {/* Asamblea COMENOR — la institución en persona */}
+            <Revelar delay={0.2}>
+              <Foto
+                src="/media/inicio/consejo-comenor.jpg"
+                alt="Integrantes de COMENOR reunidos en asamblea."
+                width={1600}
+                height={1066}
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                className="mt-10 aspect-[3/2] w-full"
+              />
             </Revelar>
 
             {/* En móvil/tablet la declaración-ancla cierra la sección */}

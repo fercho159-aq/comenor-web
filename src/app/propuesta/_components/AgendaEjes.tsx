@@ -1,4 +1,12 @@
+import {
+  Globe,
+  Landmark,
+  TrendingUp,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
+import { ChipIcono, Foto } from "@/components/ui";
 
 /**
  * Sección "Agenda COMENOR" (id: agenda).
@@ -19,11 +27,13 @@ type Eje = {
   titulo: string;
   objetivo: string;
   lineas: string[];
+  icono: LucideIcon;
 };
 
 const EJES: Eje[] = [
   {
     indice: "1",
+    icono: Landmark,
     titulo: "Incidencia de política pública y regulación",
     objetivo:
       "Que COMENOR esté en la mesa donde se decide, no en la sala de espera.",
@@ -36,6 +46,7 @@ const EJES: Eje[] = [
   },
   {
     indice: "2",
+    icono: Users,
     titulo: "Representatividad y voz del ecosistema",
     objetivo: "Que los organismos vean a COMENOR como su casa política común.",
     lineas: [
@@ -47,6 +58,7 @@ const EJES: Eje[] = [
   },
   {
     indice: "3",
+    icono: TrendingUp,
     titulo: "Infraestructura de la Calidad como motor económico",
     objetivo:
       "Pasar del discurso técnico al lenguaje de competitividad y negocio.",
@@ -59,6 +71,7 @@ const EJES: Eje[] = [
   },
   {
     indice: "4",
+    icono: Globe,
     titulo: "Agenda regional & internacional y cooperación técnica",
     objetivo:
       "Que COMENOR juegue en liga regional/internacional, no solo local.",
@@ -115,6 +128,17 @@ export default function AgendaEjes() {
           </div>
         </Revelar>
 
+        {/* Banner fotográfico: la agenda en acción (foto real del cliente) */}
+        <Revelar delay={0.1}>
+          <Foto
+            src="/media/ejes/agenda-comenor-calendario.jpg"
+            alt="Sesión de trabajo de la agenda COMENOR."
+            fill
+            sizes="(min-width: 1280px) 1200px, 100vw"
+            className="mt-12 aspect-[16/9] w-full sm:aspect-[21/9] lg:mt-16"
+          />
+        </Revelar>
+
         {/* Ejes temáticos — cuadrícula 2×2 de celdas hairline */}
         <RevelarGrupo
           as="ol"
@@ -126,12 +150,15 @@ export default function AgendaEjes() {
               key={eje.indice}
               className="border-b border-salvia p-7 sm:border-r lg:p-10"
             >
-              {/* Índice del eje — contenido de la fuente, Montserrat 300 */}
-              <span
-                aria-hidden="true"
-                className="block font-light tabular-nums text-[clamp(2.25rem,1.6rem+2vw,3rem)] leading-none text-verde"
-              >
-                {eje.indice}
+              {/* Índice del eje (contenido de la fuente) + ícono decorativo */}
+              <span className="flex items-start justify-between gap-4">
+                <span
+                  aria-hidden="true"
+                  className="block font-light tabular-nums text-[clamp(2.25rem,1.6rem+2vw,3rem)] leading-none text-verde"
+                >
+                  {eje.indice}
+                </span>
+                <ChipIcono icon={eje.icono} />
               </span>
 
               <h3 className="mt-4 text-[1.125rem] font-bold uppercase leading-snug tracking-[0.01em] text-verde">

@@ -1,3 +1,10 @@
+import {
+  BadgeCheck,
+  BookOpenCheck,
+  FlaskConical,
+  SearchCheck,
+  type LucideIcon,
+} from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
 
 /**
@@ -14,11 +21,27 @@ import { Revelar, RevelarGrupo } from "@/components/anim";
  */
 
 const DIMENSIONES = [
-  { nombre: "Normalización", detalle: "NOM · NMX · EMX" },
-  { nombre: "Certificación", detalle: "Organismos de Certificación" },
-  { nombre: "Laboratorios", detalle: "Ensayo y calibración" },
-  { nombre: "Inspección", detalle: "Unidades de inspección" },
-] as const;
+  { nombre: "Normalización", detalle: "NOM · NMX · EMX", icono: BookOpenCheck },
+  {
+    nombre: "Certificación",
+    detalle: "Organismos de Certificación",
+    icono: BadgeCheck,
+  },
+  {
+    nombre: "Laboratorios",
+    detalle: "Ensayo y calibración",
+    icono: FlaskConical,
+  },
+  {
+    nombre: "Inspección",
+    detalle: "Unidades de inspección",
+    icono: SearchCheck,
+  },
+] as const satisfies ReadonlyArray<{
+  nombre: string;
+  detalle: string;
+  icono: LucideIcon;
+}>;
 
 const MANDATO = [
   "Armonización con ISO · IEC · CODEX y organismos internacionales",
@@ -87,23 +110,31 @@ export default function OrganismoParaguas() {
           as="dl"
           className="mt-16 grid grid-cols-1 gap-y-6 border-t border-salvia/20 pt-10 sm:grid-cols-2 sm:gap-x-8 lg:mt-20 lg:grid-cols-4"
         >
-          {DIMENSIONES.map((d, i) => (
-            <div
-              key={d.nombre}
-              className={
-                i > 0
-                  ? "sm:border-l sm:border-salvia/20 sm:pl-6"
-                  : undefined
-              }
-            >
-              <dt className="text-[1.125rem] font-bold leading-snug text-blanco">
-                {d.nombre}
-              </dt>
-              <dd className="mt-1 text-[0.9375rem] leading-snug text-salvia">
-                {d.detalle}
-              </dd>
-            </div>
-          ))}
+          {DIMENSIONES.map((d, i) => {
+            const Icono = d.icono;
+            return (
+              <div
+                key={d.nombre}
+                className={
+                  i > 0
+                    ? "sm:border-l sm:border-salvia/20 sm:pl-6"
+                    : undefined
+                }
+              >
+                <Icono
+                  aria-hidden
+                  className="size-6 text-salvia"
+                  strokeWidth={1.5}
+                />
+                <dt className="mt-3 text-[1.125rem] font-bold leading-snug text-blanco">
+                  {d.nombre}
+                </dt>
+                <dd className="mt-1 text-[0.9375rem] leading-snug text-salvia">
+                  {d.detalle}
+                </dd>
+              </div>
+            );
+          })}
         </RevelarGrupo>
       </div>
     </section>

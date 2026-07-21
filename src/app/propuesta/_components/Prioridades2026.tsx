@@ -1,3 +1,10 @@
+import {
+  Handshake,
+  Landmark,
+  Network,
+  ScrollText,
+  type LucideIcon,
+} from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
 
 /**
@@ -20,12 +27,14 @@ interface Prioridad {
   indice: string;
   titulo: string;
   descripcion: string;
+  icono: LucideIcon;
   critico?: boolean;
 }
 
 const PRIORIDADES: readonly Prioridad[] = [
   {
     indice: "01",
+    icono: ScrollText,
     titulo: "Reglamento de la LIC — el obstáculo estructural",
     descripcion:
       "Pendiente desde agosto 2021. Sin él, la transición ONN→ONE está bloqueada y 490+ NMX de seis organismos miembros permanecen represadas — erosionando 30 años de propiedad intelectual normativa mexicana.",
@@ -33,18 +42,21 @@ const PRIORIDADES: readonly Prioridad[] = [
   },
   {
     indice: "02",
+    icono: Handshake,
     titulo: "T-MEC Capítulo 11 — posicionamiento soberano",
     descripcion:
       "México requiere posicionamientos técnicos propios en barreras no arancelarias y convergencia normativa trilateral. COMENOR debe ser la voz del ecosistema en esta mesa.",
   },
   {
     indice: "03",
+    icono: Landmark,
     titulo: "Mesas institucionales",
     descripcion:
       "Posicionamientos técnicos de COMENOR, con agenda estructurada ante Autoridades. La incidencia no puede ser episódica — debe ser institucionalizada.",
   },
   {
     indice: "04",
+    icono: Network,
     titulo: "Fortalecimiento del ecosistema — visión 2026",
     descripcion:
       "Formación avanzada, expansión de membresía e integración en foros regionales e internacionales.",
@@ -84,8 +96,15 @@ export default function Prioridades2026() {
               key={prioridad.indice}
               className="border-b border-r border-salvia/15 p-8 lg:p-10"
             >
-              <span className="block font-light tabular-nums text-[2rem] leading-none text-salvia">
-                {prioridad.indice}
+              <span className="flex items-start justify-between gap-4">
+                <span className="block font-light tabular-nums text-[2rem] leading-none text-salvia">
+                  {prioridad.indice}
+                </span>
+                <prioridad.icono
+                  aria-hidden
+                  className="size-6 text-salvia"
+                  strokeWidth={1.5}
+                />
               </span>
 
               {prioridad.critico ? (

@@ -1,4 +1,6 @@
+import { ShieldCheck } from "lucide-react";
 import { Revelar, RevelarGrupo } from "@/components/anim";
+import { ChipIcono } from "@/components/ui";
 
 /**
  * Sección "Código de Ética" (id: principios).
@@ -52,12 +54,9 @@ export default function CodigoEtica() {
               {/* Ficha de referencia: carácter vinculante + artículo de origen */}
               <Revelar
                 as="div"
-                className="mt-10 flex items-start gap-3 border-t border-salvia pt-8"
+                className="mt-10 flex items-start gap-4 border-t border-salvia pt-8"
               >
-                <span
-                  aria-hidden="true"
-                  className="mt-2 block h-0.5 w-3 shrink-0 bg-vino"
-                />
+                <ChipIcono icon={ShieldCheck} />
                 <div>
                   <p className="text-[1.0625rem] leading-relaxed text-tinta text-pretty">
                     <span className="font-bold text-verde">
